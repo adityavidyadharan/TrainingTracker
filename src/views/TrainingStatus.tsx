@@ -9,12 +9,20 @@ import {
   Spinner,
 } from "react-bootstrap";
 import supabase from "../clients/supabase";
-import { Section } from "../types/responses";
+import { EventType, Section, SectionWithProgress, TrainingHistorical } from "../types/responses";
 import PrereqBadge from "../components/PrereqBadge";
+import { Tables } from "../types/db";
+import { useUser } from "../providers/UserProvider";
+import getBadgeClass from "../utility/BadgeColors";
 
 export default function TrainingStatus() {
   const [sections, setSections] = useState<Section[]>([]);
+  const [trainings, setTrainings] = useState<
+    Record<number, TrainingHistorical[]>
+  >({});
+  const [progress, setProgress] = useState<Record<number, EventType>>({});
   const [loading, setLoading] = useState(true);
+  const user = useUser().user;
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -30,30 +38,59 @@ export default function TrainingStatus() {
       }
       setLoading(false);
     };
-
+    const fetchTrainings = async () => {
+      setLoading(true);
+      if (!user) return;
+      const { data, error } = await supabase
+        .from("trainings")
+        .select("*, pi:pi_id(name)")
+        .eq("student_id", user?.id);
+      if (error) {
+        console.error("Error fetching trainings:", error);
+      } else {
+        // Group trainings by section_id
+        const trainingsObj: Record<number, Tables<"trainings">[]> = {};
+        data.forEach((training) => {
+          if (!trainingsObj[training.section_id]) {
+            trainingsObj[training.section_id] = [];
+          }
+          trainingsObj[training.section_id].push(training);
+        });
+        Object.keys(trainingsObj).forEach((key) => {
+          trainingsObj[key].sort((a, b) => a.timestamp - b.timestamp);
+        });
+        setTrainings(trainingsObj);
+        // Determine progress for each section
+        const progressObj: Record<number, EventType> = {};
+        sections.forEach((section) => {
+          if (trainingsObj[section.id]) {
+            const lastTraining = trainingsObj[section.id][
+              trainingsObj[section.id].length - 1
+            ];
+            progressObj[section.id] = lastTraining.event_type;
+          } else {
+            progressObj[section.id] = "not started";
+          }
+        });
+        setProgress(progressObj);
+      }
+      setLoading(false);
+    };
+    fetchTrainings();
     fetchSections();
-  }, []);
+  }, [user]);
 
-  const listPrereq = (id: number) => {
+  const listPrereq = (id: number): SectionWithProgress[] => {
     const prereqs = [];
     let currentId: number | null = id;
     while (currentId) {
       const section = sections.find((s) => s.id === currentId);
       if (!section) break;
-      prereqs.push(section);
+      prereqs.push({ ...section, progress: progress[section.id] });
       currentId = section.prereq;
     }
     prereqs.shift();
     return prereqs.reverse();
-  };
-
-  const getBadgeClass = (stepOrStatus: string) => {
-    const lower = stepOrStatus.toLowerCase();
-    if (lower === "completed") return "bg-success";
-    if (lower === "trained") return "bg-primary";
-    if (lower === "failed test/retrained") return "bg-warning text-dark";
-    if (lower === "not started") return "bg-secondary";
-    return "bg-secondary";
   };
 
   return (
@@ -79,16 +116,58 @@ export default function TrainingStatus() {
                             <strong>{section.name}</strong>
                           </Col>
                           <Col xs={6} md={6} className="text-end">
-                            <Badge className={getBadgeClass("completed")} pill>
-                              Completed
+                            <Badge
+                              className={getBadgeClass(progress[section.id])}
+                              pill
+                            >
+                              {progress[section.id]}
                             </Badge>
                           </Col>
                         </Row>
                       </Accordion.Header>
                       <Accordion.Body>
-                        <PrereqBadge
-                          prereqs={listPrereq(section.id)}
-                        />
+                        <Row>
+                          <PrereqBadge prereqs={listPrereq(section.id)} />
+                        </Row>
+                        <Row>
+                          {trainings[section.id] ? (
+                            trainings[section.id].map((training, idx) => (
+                              <Card key={idx} className="mb-2">
+                                <Card.Body>
+                                  <Row className="align-items-center">
+                                    <Col md={3}>
+                                      <Badge
+                                        className={getBadgeClass(
+                                          training.event_type
+                                        )}
+                                        pill
+                                      >
+                                        {training.event_type}
+                                      </Badge>
+                                    </Col>
+                                    <Col md={4}>
+                                      <small className="text-muted">
+                                        Date:{" "}
+                                        {new Date(
+                                          training.timestamp
+                                        ).toLocaleDateString()}
+                                      </small>
+                                    </Col>
+                                    <Col md={5}>
+                                      <small className="text-muted">
+                                        Trained/Tested By: {training.pi.name}
+                                      </small>
+                                    </Col>
+                                  </Row>
+                                </Card.Body>
+                              </Card>
+                            ))
+                          ) : (
+                            <p className="text-muted mb-0">
+                              No steps recorded yet.
+                            </p>
+                          )}
+                        </Row>
                       </Accordion.Body>
                     </Accordion.Item>
                   ))}

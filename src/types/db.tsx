@@ -46,34 +46,31 @@ export type Database = {
       }
       trainings: {
         Row: {
-          created_at: string
-          event_timestamp: string
           event_type: Database["public"]["Enums"]["event_type"]
           id: number
           notes: string | null
           pi_id: string
           section_id: number
           student_id: string
+          timestamp: string
         }
         Insert: {
-          created_at?: string
-          event_timestamp?: string
           event_type: Database["public"]["Enums"]["event_type"]
           id?: number
           notes?: string | null
           pi_id: string
           section_id: number
           student_id: string
+          timestamp?: string
         }
         Update: {
-          created_at?: string
-          event_timestamp?: string
           event_type?: Database["public"]["Enums"]["event_type"]
           id?: number
           notes?: string | null
           pi_id?: string
           section_id?: number
           student_id?: string
+          timestamp?: string
         }
         Relationships: [
           {
@@ -131,7 +128,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      event_type: "training" | "retrained" | "completed"
+      event_type: "trained" | "retrained" | "completed"
       user_role: "student" | "provisional_pi" | "full_pi" | "admin"
     }
     CompositeTypes: {

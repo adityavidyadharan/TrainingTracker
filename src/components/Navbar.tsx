@@ -23,9 +23,14 @@ export default function Navbar() {
         <BNavbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
             {isLoggedIn ? (
-              <Link to="/status" className="nav-link">
-                Training Status
-              </Link>
+              <>
+                <Link to="/status" className="nav-link">
+                  Training Status
+                </Link>
+                <Link to="/training" className="nav-link">
+                  Log Training
+                </Link>
+              </>
             ) :(
             <Link to="/login" className="nav-link">
               Login

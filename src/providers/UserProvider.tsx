@@ -28,7 +28,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           console.error(error);
         }
       }
-      console.log(user);
       setLoading(false);
     };
 
