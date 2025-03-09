@@ -32,8 +32,10 @@ export default function TrainingStatus() {
   const user = useUser().user;
 
   useEffect(() => {
-    const fetchSections = async () => {
-      const { data, error } = await supabase
+    const fetchInfo = async () => {
+      setSectionsLoading(true);
+      setTrainingsLoading(true);
+      const { data: sectionsData, error } = await supabase
         .from("sections")
         .select("id, name, prereq")
         .eq("active", true);
@@ -41,22 +43,21 @@ export default function TrainingStatus() {
       if (error) {
         console.error("Error fetching sections:", error);
       } else {
-        setSections(data);
+        setSections(sectionsData);
       }
       setSectionsLoading(false);
-    };
-    const fetchTrainings = async () => {
       if (!user) return;
-      const { data, error } = await supabase
+
+      const { data: trainingData, error: trainingError } = await supabase
         .from("trainings")
         .select("*, pi:users!pi_id(name)")
         .eq("student_id", user?.id);
-      if (error) {
+      if (trainingError) {
         console.error("Error fetching trainings:", error);
       } else {
         // Group trainings by section_id
         const trainingsObj: Record<number, TrainingHistorical[]> = {};
-        data.forEach((training) => {
+        trainingData.forEach((training) => {
           if (!trainingsObj[training.section_id]) {
             trainingsObj[training.section_id] = [];
           }
@@ -76,7 +77,7 @@ export default function TrainingStatus() {
         setTrainings(trainingsObj);
         // Determine progress for each section
         const progressObj: Record<number, EventTypePlusNotStarted> = {};
-        sections.forEach((section) => {
+        sectionsData.forEach((section) => {
           if (trainingsObj[section.id]) {
             const lastTraining =
               trainingsObj[section.id][0];
@@ -85,12 +86,12 @@ export default function TrainingStatus() {
             progressObj[section.id] = "not started";
           }
         });
+        console.log(progressObj);
         setProgress(progressObj);
       }
       setTrainingsLoading(false);
     };
-    fetchTrainings();
-    fetchSections();
+    fetchInfo();
   }, [user]);
 
   const listPrereq = (id: number): SectionWithProgress[] => {
