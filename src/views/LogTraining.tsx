@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Container, Row, Col, Alert, Button, Form } from "react-bootstrap";
 import { useUser } from "../providers/UserProvider";
 import supabase from "../clients/supabase";
-import { Database } from "../types/db";
 import { EventType } from "../types/responses";
 
 export default function LogTraining() {

@@ -8,7 +8,7 @@ interface Section {
 }
 
 interface SectionWithProgress extends Section {
-  progress: EventType;
+  progress: EventTypePlusNotStarted;
 }
 
 type TrainingHistorical = Tables<"trainings"> & { pi: { name: string } };
@@ -16,6 +16,7 @@ type TrainingHistorical = Tables<"trainings"> & { pi: { name: string } };
 type RoledUser = User & { user_role: string };
 
 type EventType = Database["public"]["Enums"]["event_type"];
+type EventTypePlusNotStarted = EventType | "not started";
 
 export type {
   Section,
@@ -23,4 +24,5 @@ export type {
   RoledUser,
   TrainingHistorical,
   EventType,
+  EventTypePlusNotStarted,
 };

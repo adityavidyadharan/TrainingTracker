@@ -9,9 +9,13 @@ import {
   Spinner,
 } from "react-bootstrap";
 import supabase from "../clients/supabase";
-import { EventType, Section, SectionWithProgress, TrainingHistorical } from "../types/responses";
+import {
+  EventTypePlusNotStarted,
+  Section,
+  SectionWithProgress,
+  TrainingHistorical,
+} from "../types/responses";
 import PrereqBadge from "../components/PrereqBadge";
-import { Tables } from "../types/db";
 import { useUser } from "../providers/UserProvider";
 import getBadgeClass from "../utility/BadgeColors";
 
@@ -20,8 +24,11 @@ export default function TrainingStatus() {
   const [trainings, setTrainings] = useState<
     Record<number, TrainingHistorical[]>
   >({});
-  const [progress, setProgress] = useState<Record<number, EventType>>({});
-  const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState<Record<number, EventTypePlusNotStarted>>({});
+  const [sectionsLoading, setSectionsLoading] = useState(true);
+  const [trainingsLoading, setTrainingsLoading] = useState(true);
+  const loading = sectionsLoading || trainingsLoading;
+  // const [loading, setLoading] = useState(true);
   const user = useUser().user;
 
   useEffect(() => {
@@ -36,20 +43,19 @@ export default function TrainingStatus() {
       } else {
         setSections(data);
       }
-      setLoading(false);
+      setSectionsLoading(false);
     };
     const fetchTrainings = async () => {
-      setLoading(true);
       if (!user) return;
       const { data, error } = await supabase
         .from("trainings")
-        .select("*, pi:pi_id(name)")
+        .select("*, pi:users!pi_id(name)")
         .eq("student_id", user?.id);
       if (error) {
         console.error("Error fetching trainings:", error);
       } else {
         // Group trainings by section_id
-        const trainingsObj: Record<number, Tables<"trainings">[]> = {};
+        const trainingsObj: Record<number, TrainingHistorical[]> = {};
         data.forEach((training) => {
           if (!trainingsObj[training.section_id]) {
             trainingsObj[training.section_id] = [];
@@ -57,16 +63,23 @@ export default function TrainingStatus() {
           trainingsObj[training.section_id].push(training);
         });
         Object.keys(trainingsObj).forEach((key) => {
-          trainingsObj[key].sort((a, b) => a.timestamp - b.timestamp);
+          const sectionId = parseInt(key);
+          trainingsObj[sectionId].sort(
+            (a: TrainingHistorical, b: TrainingHistorical) => {
+              return (
+                new Date(b.timestamp).getTime() -
+                new Date(a.timestamp).getTime()
+              );
+            }
+          );
         });
         setTrainings(trainingsObj);
         // Determine progress for each section
-        const progressObj: Record<number, EventType> = {};
+        const progressObj: Record<number, EventTypePlusNotStarted> = {};
         sections.forEach((section) => {
           if (trainingsObj[section.id]) {
-            const lastTraining = trainingsObj[section.id][
-              trainingsObj[section.id].length - 1
-            ];
+            const lastTraining =
+              trainingsObj[section.id][0];
             progressObj[section.id] = lastTraining.event_type;
           } else {
             progressObj[section.id] = "not started";
@@ -74,7 +87,7 @@ export default function TrainingStatus() {
         });
         setProgress(progressObj);
       }
-      setLoading(false);
+      setTrainingsLoading(false);
     };
     fetchTrainings();
     fetchSections();

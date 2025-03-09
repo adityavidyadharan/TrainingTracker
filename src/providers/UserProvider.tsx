@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import supabase from "../clients/supabase";
-import { User } from "@supabase/auth-js";
 import { RoledUser } from "../types/responses";
 
 const UserContext = createContext<{ user: RoledUser | null; loading: boolean }>({

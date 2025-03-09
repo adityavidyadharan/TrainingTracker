@@ -24,8 +24,9 @@ export default function Login() {
           appearance={{ theme: ThemeSupa }}
           providers={["azure"]}
           providerScopes={{ azure: "openid profile email" }}
-          onlyThirdPartyProviders
-          redirectTo={`${window.location.origin}/profile`}
+          onlyThirdPartyProviders 
+          // redirectTo={`${window.location.origin}/TrainingTracker/#/oauth-redirect`}
+          redirectTo={`${window.location.origin}/TrainingTracker/profile`}
         />
       </div>
     </div>

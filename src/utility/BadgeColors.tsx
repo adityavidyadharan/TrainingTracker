@@ -1,6 +1,6 @@
-import { EventType } from "../types/responses";
+import { EventTypePlusNotStarted } from "../types/responses";
 
-export default function getBadgeClass(event?: EventType | "not started"): string {
+export default function getBadgeClass(event?: EventTypePlusNotStarted): string {
   if (!event) return "bg-secondary";
   const lower = event.toLowerCase();
   if (lower === "completed") return "bg-success";
