@@ -18,7 +18,11 @@ export default function Navbar() {
   return (
     <BNavbar bg="light" expand="lg">
       <Container>
-        <BNavbar.Brand href="/">ISGT Training Tracker</BNavbar.Brand>
+        <BNavbar.Brand>
+          <Link to="/" className="nav-link">
+            <BNavbar.Brand>ISGT Training Tracker</BNavbar.Brand>
+          </Link>
+        </BNavbar.Brand>
         <BNavbar.Toggle aria-controls="basic-navbar-nav" />
         <BNavbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">

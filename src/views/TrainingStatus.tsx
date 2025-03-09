@@ -42,6 +42,7 @@ export default function TrainingStatus() {
 
       if (error) {
         console.error("Error fetching sections:", error);
+        return;
       } else {
         setSections(sectionsData);
       }
