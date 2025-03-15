@@ -34,6 +34,9 @@ export default function Navbar() {
                 <Link to="/training" className="nav-link">
                   Log Training
                 </Link>
+                <Link to="/search" className="nav-link">
+                  User Search
+                </Link>
               </>
             ) :(
             <Link to="/login" className="nav-link">

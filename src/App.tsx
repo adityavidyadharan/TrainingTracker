@@ -8,6 +8,7 @@ import Profile from "./views/Profile";
 import { UserProvider } from "./providers/UserProvider";
 import LogTraining from "./views/LogTraining";
 import OAuthHandler from "./views/OAuthHandler";
+import UserSearch from "./views/UserSearch";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/training" element={<LogTraining />} />
           <Route path="/status" element={<TrainingStatus />} />
+          <Route path="/search" element={<UserSearch />} />
         </Routes>
       </UserProvider>
     </BrowserRouter>

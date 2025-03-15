@@ -18,82 +18,98 @@ import {
 import PrereqBadge from "../components/PrereqBadge";
 import { useUser } from "../providers/UserProvider";
 import getBadgeClass from "../utility/BadgeColors";
+import TrainingCard from "../components/TrainingCard";
 
-export default function TrainingStatus() {
+export default function TrainingStatus({ user_id }: { user_id?: string }) {
   const [sections, setSections] = useState<Section[]>([]);
   const [trainings, setTrainings] = useState<
     Record<number, TrainingHistorical[]>
   >({});
   const [progress, setProgress] = useState<Record<number, EventTypePlusNotStarted>>({});
-  const [sectionsLoading, setSectionsLoading] = useState(true);
-  const [trainingsLoading, setTrainingsLoading] = useState(true);
-  const loading = sectionsLoading || trainingsLoading;
-  // const [loading, setLoading] = useState(true);
-  const user = useUser().user;
+  const [loading, setLoading] = useState(true);
+  let user: string;
+  const currentUser = useUser().user;
+  if (user_id) {
+    user = user_id;
+  } else {
+    user = currentUser?.id || "";
+  }
 
+  const fetchInfo = async () => {
+    setLoading(true);
+    const { data: sectionsData, error } = await supabase
+      .from("sections")
+      .select("id, name, prereq")
+      .eq("active", true);
+
+    if (error) {
+      console.error("Error fetching sections:", error);
+      return;
+    } else {
+      setSections(sectionsData);
+    }
+    if (!user) return;
+
+    const { data: trainingData, error: trainingError } = await supabase
+      .from("trainings")
+      .select("*, pi:users!pi_id(name)")
+      .eq("student_id", user)
+      .order("timestamp", { ascending: true });
+    if (trainingError) {
+      console.error("Error fetching trainings:", error);
+    } else {
+      // Group trainings by section_id
+      const trainingsObj: Record<number, TrainingHistorical[]> = {};
+      trainingData.forEach((training) => {
+        if (!trainingsObj[training.section_id]) {
+          trainingsObj[training.section_id] = [];
+        }
+        trainingsObj[training.section_id].push(training);
+      });
+      Object.keys(trainingsObj).forEach((key) => {
+        const sectionId = parseInt(key);
+        trainingsObj[sectionId].sort(
+          (a: TrainingHistorical, b: TrainingHistorical) => {
+            return (
+              new Date(b.timestamp).getTime() -
+              new Date(a.timestamp).getTime()
+            );
+          }
+        );
+      });
+      setTrainings(trainingsObj);
+      // Determine progress for each section
+      const progressObj: Record<number, EventTypePlusNotStarted> = {};
+      sectionsData.forEach((section) => {
+        if (trainingsObj[section.id]) {
+          const lastTraining =
+            trainingsObj[section.id][0];
+          progressObj[section.id] = lastTraining.event_type;
+        } else {
+          progressObj[section.id] = "not started";
+        }
+      });
+      setProgress(progressObj);
+    }
+    setLoading(false);
+  };
+
+  const deleteTraining = async (trainingId: number) => {
+    const { error } = await supabase
+      .from("trainings")
+      .delete()
+      .eq("id", trainingId);
+    if (error) {
+      console.error("Error deleting training:", error);
+    } else {
+      fetchInfo();
+    }
+  };
+
+  
   useEffect(() => {
-    const fetchInfo = async () => {
-      setSectionsLoading(true);
-      setTrainingsLoading(true);
-      const { data: sectionsData, error } = await supabase
-        .from("sections")
-        .select("id, name, prereq")
-        .eq("active", true);
-
-      if (error) {
-        console.error("Error fetching sections:", error);
-        return;
-      } else {
-        setSections(sectionsData);
-      }
-      setSectionsLoading(false);
-      if (!user) return;
-
-      const { data: trainingData, error: trainingError } = await supabase
-        .from("trainings")
-        .select("*, pi:users!pi_id(name)")
-        .eq("student_id", user?.id);
-      if (trainingError) {
-        console.error("Error fetching trainings:", error);
-      } else {
-        // Group trainings by section_id
-        const trainingsObj: Record<number, TrainingHistorical[]> = {};
-        trainingData.forEach((training) => {
-          if (!trainingsObj[training.section_id]) {
-            trainingsObj[training.section_id] = [];
-          }
-          trainingsObj[training.section_id].push(training);
-        });
-        Object.keys(trainingsObj).forEach((key) => {
-          const sectionId = parseInt(key);
-          trainingsObj[sectionId].sort(
-            (a: TrainingHistorical, b: TrainingHistorical) => {
-              return (
-                new Date(b.timestamp).getTime() -
-                new Date(a.timestamp).getTime()
-              );
-            }
-          );
-        });
-        setTrainings(trainingsObj);
-        // Determine progress for each section
-        const progressObj: Record<number, EventTypePlusNotStarted> = {};
-        sectionsData.forEach((section) => {
-          if (trainingsObj[section.id]) {
-            const lastTraining =
-              trainingsObj[section.id][0];
-            progressObj[section.id] = lastTraining.event_type;
-          } else {
-            progressObj[section.id] = "not started";
-          }
-        });
-        console.log(progressObj);
-        setProgress(progressObj);
-      }
-      setTrainingsLoading(false);
-    };
     fetchInfo();
-  }, [user]);
+  }, []);
 
   const listPrereq = (id: number): SectionWithProgress[] => {
     const prereqs = [];
@@ -147,35 +163,12 @@ export default function TrainingStatus() {
                         <Row>
                           {trainings[section.id] ? (
                             trainings[section.id].map((training, idx) => (
-                              <Card key={idx} className="mb-2">
-                                <Card.Body>
-                                  <Row className="align-items-center">
-                                    <Col md={3}>
-                                      <Badge
-                                        className={getBadgeClass(
-                                          training.event_type
-                                        )}
-                                        pill
-                                      >
-                                        {training.event_type}
-                                      </Badge>
-                                    </Col>
-                                    <Col md={4}>
-                                      <small className="text-muted">
-                                        Date:{" "}
-                                        {new Date(
-                                          training.timestamp
-                                        ).toLocaleDateString()}
-                                      </small>
-                                    </Col>
-                                    <Col md={5}>
-                                      <small className="text-muted">
-                                        Trained/Tested By: {training.pi.name}
-                                      </small>
-                                    </Col>
-                                  </Row>
-                                </Card.Body>
-                              </Card>
+                              <TrainingCard
+                                training={training}
+                                idx={idx}
+                                key={idx}
+                                deleteTraining={deleteTraining}
+                              />
                             ))
                           ) : (
                             <p className="text-muted mb-0">

@@ -8,7 +8,7 @@ export default function PrereqBadge({ prereqs }: { prereqs: SectionWithProgress[
       <span>Prerequisites: </span>
       {prereqs.length > 0 ? (
         prereqs.map((prereq) => (
-          <Badge key={prereq.id} className={getBadgeClass(prereq.progress)} pill>
+          <Badge key={prereq.id} className={`${getBadgeClass(prereq.progress)} ms-1`} pill>
             {prereq.name}
           </Badge>
         ))
