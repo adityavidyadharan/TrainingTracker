@@ -37,6 +37,9 @@ export default function Navbar() {
                 <Link to="/search" className="nav-link">
                   User Search
                 </Link>
+                <Link to="/roles" className="nav-link">
+                  User Roles
+                </Link>
               </>
             ) :(
             <Link to="/login" className="nav-link">

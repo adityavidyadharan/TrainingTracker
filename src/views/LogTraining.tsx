@@ -5,7 +5,7 @@ import supabase from "../clients/supabase";
 import { EventType } from "../types/responses";
 import { useLocation, useNavigate } from "react-router";
 import { Tables } from "../types/db";
-import { lookupSection, lookupStudent } from "../utility/Lookup";
+import { lookupSection, lookupStudent } from "../utility/SupabaseOperations";
 import { DateTime } from "luxon";
 
 export default function LogTraining() {

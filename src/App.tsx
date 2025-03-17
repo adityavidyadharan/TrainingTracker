@@ -9,22 +9,28 @@ import { UserProvider } from "./providers/UserProvider";
 import LogTraining from "./views/LogTraining";
 import OAuthHandler from "./views/OAuthHandler";
 import UserSearch from "./views/UserSearch";
+import UserRoles from "./views/admin/UserRoles";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
+  const queryClient = new QueryClient();
   return (
     <BrowserRouter basename="/TrainingTracker">
-      <UserProvider>
-        <Navbar />
-        <Routes>
-          <Route path="/oauth-redirect" element={<OAuthHandler />} />
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/training" element={<LogTraining />} />
-          <Route path="/status" element={<TrainingStatus />} />
-          <Route path="/search" element={<UserSearch />} />
-        </Routes>
-      </UserProvider>
+      <QueryClientProvider client={queryClient}>
+        <UserProvider>
+          <Navbar />
+          <Routes>
+            <Route path="/oauth-redirect" element={<OAuthHandler />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/training" element={<LogTraining />} />
+            <Route path="/status" element={<TrainingStatus />} />
+            <Route path="/search" element={<UserSearch />} />
+            <Route path="/roles" element={<UserRoles />} />
+          </Routes>
+        </UserProvider>
+      </QueryClientProvider>
     </BrowserRouter>
   );
 }
