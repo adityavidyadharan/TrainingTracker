@@ -109,7 +109,7 @@ export default function LogTraining() {
       student_id: student.id,
       section_id: selectedToolGroup,
       event_type: eventType,
-      timestamp: DateTime.fromISO(timestamp).toISO(),
+      timestamp: DateTime.fromISO(timestamp).toISO() || "",
       notes,
     }));
 
@@ -164,7 +164,7 @@ export default function LogTraining() {
           )}
           
           {success && (
-            <Alert variant="success" className="bg-green-50 text-green-800 border-green-200">
+            <Alert variant="default" className="bg-green-50 text-green-800 border-green-200">
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>{success}</AlertDescription>
             </Alert>

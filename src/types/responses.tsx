@@ -14,7 +14,7 @@ interface SectionWithProgress extends Section {
 type TrainingHistorical = Tables<"trainings"> & { pi: { name: string } };
 
 type UserRoles = Database["public"]["Enums"]["user_role"];
-type RoledUser = User & { user_role: string };
+type RoledUser = User & { user_role: UserRoles };
 
 type EventType = Database["public"]["Enums"]["event_type"];
 type EventTypePlusNotStarted = EventType | "not started";
