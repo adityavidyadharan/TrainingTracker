@@ -25,15 +25,15 @@ export default function LogTraining() {
   const [trainingId, setTrainingId] = useState<number | null>(null);
   const [emails, setEmails] = useState([""]);
   const [toolGroups, setToolGroups] = useState<{ id: number; name: string }[]>(
-    []
+    [],
   );
   const [selectedToolGroup, setSelectedToolGroup] = useState<number | null>(
-    null
+    null,
   );
   const [eventType, setEventType] = useState<EventType>("trained");
   const [notes, setNotes] = useState("");
   const [timestamp, setTimestamp] = useState<string>(
-    DateTime.now().toISO()?.slice(0, 16) || ""
+    DateTime.now().toISO()?.slice(0, 16) || "",
   );
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -54,10 +54,14 @@ export default function LogTraining() {
         setEmails([
           (await lookupStudent(existingData.student_id))?.email || "",
         ]);
-        setSelectedToolGroup((await lookupSection(existingData.section_id))?.id || null);
+        setSelectedToolGroup(
+          (await lookupSection(existingData.section_id))?.id || null,
+        );
         setEventType(existingData.event_type);
         setNotes(existingData.notes || "");
-        setTimestamp(DateTime.fromISO(existingData.timestamp).toISO()?.slice(0, 16) || "");
+        setTimestamp(
+          DateTime.fromISO(existingData.timestamp).toISO()?.slice(0, 16) || "",
+        );
       }
     };
     populateInfo();
@@ -90,12 +94,12 @@ export default function LogTraining() {
       .select("id, email")
       .in(
         "email",
-        emails.filter((email) => email.trim() !== "")
+        emails.filter((email) => email.trim() !== ""),
       );
 
     if (studentError || !students || students.length === 0) {
       setError(
-        "Some or all student emails were not found. Please check and try again."
+        "Some or all student emails were not found. Please check and try again.",
       );
       return;
     }
@@ -153,7 +157,9 @@ export default function LogTraining() {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="max-w-3xl mx-auto">
-        <h2 className="text-2xl font-bold text-center mb-6">Log Training Event</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">
+          Log Training Event
+        </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
@@ -162,9 +168,12 @@ export default function LogTraining() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          
+
           {success && (
-            <Alert variant="default" className="bg-green-50 text-green-800 border-green-200">
+            <Alert
+              variant="default"
+              className="bg-green-50 text-green-800 border-green-200"
+            >
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>{success}</AlertDescription>
             </Alert>
@@ -188,7 +197,9 @@ export default function LogTraining() {
                 <Button
                   type="button"
                   variant="destructive"
-                  onClick={() => setEmails(emails.filter((_, i) => i !== index))}
+                  onClick={() =>
+                    setEmails(emails.filter((_, i) => i !== index))
+                  }
                   disabled={emails.length === 1}
                   className="shrink-0"
                 >
@@ -227,8 +238,8 @@ export default function LogTraining() {
 
           <div className="space-y-2">
             <Label htmlFor="eventType">Event Type</Label>
-            <Select 
-              value={eventType} 
+            <Select
+              value={eventType}
               onValueChange={(value) => setEventType(value as EventType)}
             >
               <SelectTrigger>
@@ -264,12 +275,12 @@ export default function LogTraining() {
 
           <div className="space-y-2">
             <Label htmlFor="instructor">Instructor</Label>
-            <Input 
-              id="instructor" 
-              type="text" 
-              value={PIuser?.email || ""} 
-              readOnly 
-              disabled 
+            <Input
+              id="instructor"
+              type="text"
+              value={PIuser?.email || ""}
+              readOnly
+              disabled
             />
           </div>
 

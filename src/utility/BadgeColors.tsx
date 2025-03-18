@@ -1,6 +1,8 @@
 import { EventTypePlusNotStarted } from "../types/responses";
 
-export default function getBadgeVariant(event?: EventTypePlusNotStarted): string {
+export default function getBadgeVariant(
+  event?: EventTypePlusNotStarted,
+): string {
   if (!event) return "secondary";
   const lower = event.toLowerCase();
   switch (lower) {
@@ -15,4 +17,4 @@ export default function getBadgeVariant(event?: EventTypePlusNotStarted): string
     default:
       return "bg-white text-black";
   }
-};
+}

@@ -33,10 +33,22 @@ export default function Profile() {
         <CardContent>
           {user ? (
             <div className="space-y-3">
-              <p><span className="font-bold">Name:</span> {user.user_metadata.full_name}</p>
-              <p><span className="font-bold">Email:</span> {user.email}</p>
-              <p><span className="font-bold">Role:</span> {formatUserRole(user.user_role)}</p>
-              <Button variant="destructive" className="w-full mt-6" onClick={handleLogout}>
+              <p>
+                <span className="font-bold">Name:</span>{" "}
+                {user.user_metadata.full_name}
+              </p>
+              <p>
+                <span className="font-bold">Email:</span> {user.email}
+              </p>
+              <p>
+                <span className="font-bold">Role:</span>{" "}
+                {formatUserRole(user.user_role)}
+              </p>
+              <Button
+                variant="destructive"
+                className="w-full mt-6"
+                onClick={handleLogout}
+              >
                 Logout
               </Button>
             </div>

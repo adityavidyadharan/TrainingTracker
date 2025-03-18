@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import supabase from "../clients/supabase";
 import LoginDropdown from "./LoginDropdown";
-import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@radix-ui/react-navigation-menu";
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuLink,
+} from "@radix-ui/react-navigation-menu";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

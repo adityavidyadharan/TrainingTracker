@@ -22,9 +22,9 @@ export default function TrainingCard({
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const user = useUser().user;
-  
+
   if (!user) return null;
-  
+
   const canModify = user.role === "admin" || user.id === training.pi_id;
 
   const handleEdit = () => {
@@ -46,26 +46,26 @@ export default function TrainingCard({
               {training.event_type}
             </Badge>
           </div>
-          
+
           <div>
             <span className="text-sm text-muted-foreground">
               Date: {new Date(training.timestamp).toLocaleDateString()}
             </span>
           </div>
-          
+
           <div>
             <span className="text-sm text-muted-foreground">
               Trained/Tested By:
               <br /> {training.pi.name}
             </span>
           </div>
-          
+
           {canModify && (
             <div className="flex justify-start md:justify-end gap-2">
               <Button size="sm" variant="outline" onClick={handleEdit}>
                 Edit
               </Button>
-              
+
               {loading ? (
                 <Button size="sm" variant="destructive" disabled>
                   <Loader2 className="h-4 w-4 animate-spin mr-1" />

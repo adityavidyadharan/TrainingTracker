@@ -9,7 +9,9 @@ export default function Login() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) navigate("/profile");
     };
     checkUser();
@@ -23,7 +25,7 @@ export default function Login() {
           appearance={{ theme: ThemeSupa }}
           providers={["azure"]}
           providerScopes={{ azure: "openid profile email" }}
-          onlyThirdPartyProviders 
+          onlyThirdPartyProviders
           // redirectTo={`${window.location.origin}/TrainingTracker/#/oauth-redirect`}
           redirectTo={`${window.location.origin}/TrainingTracker/profile`}
         />

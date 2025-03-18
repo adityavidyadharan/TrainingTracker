@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Person } from "react-bootstrap-icons";
 import supabase from "../clients/supabase";
 
@@ -13,7 +18,7 @@ export default function LoginDropdown() {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_, session) => {
         setUser(session?.user?.email || null);
-      }
+      },
     );
     return () => authListener?.subscription.unsubscribe();
   }, []);
@@ -36,7 +41,10 @@ export default function LoginDropdown() {
             <DropdownMenuItem asChild>
               <Link to="/profile">Profile</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleLogout} className="text-danger cursor-pointer">
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-danger cursor-pointer"
+            >
               Logout
             </DropdownMenuItem>
           </>

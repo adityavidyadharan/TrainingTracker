@@ -26,7 +26,7 @@ export default function DataTable<TData>({
         <TableHeader>
           {isLoading
             ? table.getHeaderGroups().map((headerGroup) => (
-                <TableRow>
+                <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <TableHead key={header.id}>
                       <Skeleton className="h-6 w-full" />
@@ -44,13 +44,13 @@ export default function DataTable<TData>({
                         header.column.getIsSorted() === "asc"
                           ? "text-blue-500"
                           : header.column.getIsSorted() === "desc"
-                          ? "text-red-500"
-                          : ""
+                            ? "text-red-500"
+                            : ""
                       }`}
                     >
                       {flexRender(
                         header.column.columnDef.header,
-                        header.getContext()
+                        header.getContext(),
                       )}
                       {header.column.getIsSorted() === "asc" && " ↑"}
                       {header.column.getIsSorted() === "desc" && " ↓"}

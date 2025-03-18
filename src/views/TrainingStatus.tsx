@@ -27,9 +27,11 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
   const [trainings, setTrainings] = useState<
     Record<number, TrainingHistorical[]>
   >({});
-  const [progress, setProgress] = useState<Record<number, EventTypePlusNotStarted>>({});
+  const [progress, setProgress] = useState<
+    Record<number, EventTypePlusNotStarted>
+  >({});
   const [loading, setLoading] = useState(true);
-  
+
   let user: string;
   const currentUser = useUser().user;
   if (user_id) {
@@ -58,7 +60,7 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
       .select("*, pi:users!pi_id(name)")
       .eq("student_id", user)
       .order("timestamp", { ascending: true });
-      
+
     if (trainingError) {
       console.error("Error fetching trainings:", error);
     } else {
@@ -70,21 +72,20 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
         }
         trainingsObj[training.section_id].push(training);
       });
-      
+
       Object.keys(trainingsObj).forEach((key) => {
         const sectionId = parseInt(key);
         trainingsObj[sectionId].sort(
           (a: TrainingHistorical, b: TrainingHistorical) => {
             return (
-              new Date(b.timestamp).getTime() -
-              new Date(a.timestamp).getTime()
+              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
             );
-          }
+          },
         );
       });
-      
+
       setTrainings(trainingsObj);
-      
+
       // Determine progress for each section
       const progressObj: Record<number, EventTypePlusNotStarted> = {};
       sectionsData.forEach((section) => {
@@ -111,7 +112,7 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
       fetchInfo();
     }
   };
-  
+
   useEffect(() => {
     fetchInfo();
   }, []);
@@ -146,10 +147,10 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
                 <AccordionItem value={`item-${i}`} key={section.id}>
                   <AccordionTrigger className="px-4 no-underline">
                     <div className="flex justify-between w-full">
-                      <div className="font-medium no-underline">{section.name}</div>
-                      <Badge 
-                        className={getBadgeVariant(progress[section.id])}
-                      >
+                      <div className="font-medium no-underline">
+                        {section.name}
+                      </div>
+                      <Badge className={getBadgeVariant(progress[section.id])}>
                         {progress[section.id]}
                       </Badge>
                     </div>

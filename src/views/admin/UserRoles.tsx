@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createColumnHelper,
-  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -10,14 +9,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -44,7 +35,8 @@ import TablePagination from "../../components/TablePagination";
 import DataTable from "../../components/DataTable";
 
 declare module "@tanstack/table-core" {
-  interface ColumnMeta<TData extends unknown, TValue> {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint, @typescript-eslint/no-unused-vars
+  interface ColumnMeta<TData extends unknown = unknown, TValue = unknown> {
     headerClassName?: string;
     bodyClassName?: string;
   }
@@ -164,7 +156,7 @@ export default function UserManagementPage() {
         },
       }),
     ],
-    [columnHelper, updateRoleMutation]
+    [columnHelper, updateRoleMutation],
   );
 
   const table = useReactTable({
@@ -237,7 +229,13 @@ export default function UserManagementPage() {
           </SelectContent>
         </Select>
         {(roleFilter || globalFilter) && (
-          <Button variant="outline" onClick={() => {setRoleFilter(""); setGlobalFilter("")}}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setRoleFilter("");
+              setGlobalFilter("");
+            }}
+          >
             Clear
           </Button>
         )}
@@ -257,7 +255,12 @@ export default function UserManagementPage() {
       <div className="border rounded-md">
         <DataTable table={table} isLoading={isLoading} />
       </div>
-      <TablePagination pagination={pagination} users={users} pages={pages} table={table} />
+      <TablePagination
+        pagination={pagination}
+        users={users}
+        pages={pages}
+        table={table}
+      />
     </div>
   );
 }

@@ -15,7 +15,4 @@ function formatUserRole(user: UserRoles): string {
   }
 }
 
-
-export {
-  formatUserRole,
-}
+export { formatUserRole };

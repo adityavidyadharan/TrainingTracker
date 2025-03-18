@@ -49,7 +49,7 @@ export default function UserSearch() {
         } else {
           setError("User not found");
         }
-      })(); 
+      })();
     } else {
       setSelectedUser(null);
     }
@@ -87,7 +87,7 @@ export default function UserSearch() {
         enableGlobalFilter: false,
       }),
     ],
-    [columnHelper]
+    [columnHelper],
   );
 
   const table = useReactTable({
@@ -100,7 +100,7 @@ export default function UserSearch() {
     onPaginationChange: setPagination,
     state: {
       globalFilter,
-      pagination
+      pagination,
     },
     onGlobalFilterChange: setGlobalFilter,
   });
