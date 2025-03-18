@@ -42,7 +42,7 @@ export default function TrainingCard({
       <CardContent className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center">
           <div>
-            <Badge variant={getBadgeVariant(training.event_type)}>
+            <Badge className={getBadgeVariant(training.event_type)}>
               {training.event_type}
             </Badge>
           </div>

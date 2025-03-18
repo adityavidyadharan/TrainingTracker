@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import supabase from "../clients/supabase";
-import { Container, Card, Button, Spinner } from "react-bootstrap";
+import { formatUserRole } from "../utility/Formatting";
 import { useNavigate } from "react-router";
 import { useUser } from "../providers/UserProvider";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const user = useUser().user
+  const user = useUser().user;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -23,25 +25,29 @@ export default function Profile() {
   };
 
   return (
-    <Container className="d-flex flex-column align-items-center justify-content-center vh-100">
-      <Card className="shadow-sm p-4" style={{ width: "100%", maxWidth: "400px" }}>
-        <Card.Body>
-          <Card.Title className="text-center mb-3">Profile</Card.Title>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <Card className="w-full max-w-md shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-center">Profile</CardTitle>
+        </CardHeader>
+        <CardContent>
           {user ? (
-            <div>
-              <p><strong>Name:</strong> {user.user_metadata.full_name}</p>
-              <p><strong>Email:</strong> {user.email}</p>
-              <p><strong>Role:</strong> {user.user_metadata?.role || "User"}</p>
-              <Button variant="danger" className="w-100 mt-3" onClick={handleLogout}>Logout</Button>
+            <div className="space-y-3">
+              <p><span className="font-bold">Name:</span> {user.user_metadata.full_name}</p>
+              <p><span className="font-bold">Email:</span> {user.email}</p>
+              <p><span className="font-bold">Role:</span> {formatUserRole(user.user_role)}</p>
+              <Button variant="destructive" className="w-full mt-6" onClick={handleLogout}>
+                Logout
+              </Button>
             </div>
           ) : (
-            <div className="text-center">
-              <Spinner animation="border" role="status" />
+            <div className="flex flex-col items-center justify-center py-4">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
               <p className="mt-2">Loading...</p>
             </div>
           )}
-        </Card.Body>
+        </CardContent>
       </Card>
-    </Container>
+    </div>
   );
 }

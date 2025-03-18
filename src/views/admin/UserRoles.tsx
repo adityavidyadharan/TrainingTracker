@@ -4,6 +4,8 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -22,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tables } from "../../types/db";
 import supabase from "../../clients/supabase";
@@ -32,6 +35,8 @@ import { toast } from "sonner";
 type User = Pick<Tables<"users">, "id" | "name" | "email" | "role">;
 
 import "@tanstack/react-table";
+import { formatUserRole } from "../../utility/Formatting";
+import { Link } from "react-router";
 
 declare module "@tanstack/table-core" {
   interface ColumnMeta<TData extends unknown, TValue> {
@@ -42,6 +47,8 @@ declare module "@tanstack/table-core" {
 
 export default function UserManagementPage() {
   const queryClient = useQueryClient();
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
 
   const {
     data: users = [],
@@ -80,17 +87,25 @@ export default function UserManagementPage() {
     () => [
       columnHelper.accessor("name", {
         header: "Name",
-        cell: (info) => info.getValue(),
+        cell: (info) => {
+          return (
+            <Link to={`/search?sid=${info.row.original.id}`} className="underline">
+              {info.getValue()}
+            </Link>
+          )
+        }
       }),
       columnHelper.accessor("email", {
         header: "Email",
         cell: (info) => info.getValue(),
       }),
-      columnHelper.display({
+      columnHelper.accessor("role", {
         header: "Role",
-        meta: {
-          headerClassName: "text-left",
-        },
+        cell: (info) => formatUserRole(info.getValue()),
+        enableSorting: true, // Enable sorting on role column
+      }),
+      columnHelper.display({
+        header: "Actions",
         cell: ({ row }) => {
           const user = row.original;
           const [tempRole, setTempRole] = useState(user.role);
@@ -107,29 +122,25 @@ export default function UserManagementPage() {
 
           return (
             <div className="flex items-center gap-2">
-                <Select
-                  value={tempRole}
-                  onValueChange={(value) => setTempRole(value as UserRoles)}
-                >
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="student">Student</SelectItem>
-                    <SelectItem value="provisional_pi">
-                      Provisional PI
-                    </SelectItem>
-                    <SelectItem value="full_pi">Full PI</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                  </SelectContent>
-                </Select>
-              <div className="w-16 flex justify-end">
-                {hasChanged && (
-                  <Button size="sm" onClick={handleSave}>
-                    Save
-                  </Button>
-                )}
-              </div>
+              <Select
+                value={tempRole}
+                onValueChange={(value) => setTempRole(value as UserRoles)}
+              >
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="provisional_pi">Provisional PI</SelectItem>
+                  <SelectItem value="full_pi">Full PI</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+              {hasChanged && (
+                <Button size="sm" onClick={handleSave}>
+                  Save
+                </Button>
+              )}
             </div>
           );
         },
@@ -142,6 +153,12 @@ export default function UserManagementPage() {
     data: users,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      globalFilter,
+    },
+    onGlobalFilterChange: setGlobalFilter,
   });
 
   if (isLoading) return <div>Loading users...</div>;
@@ -149,6 +166,30 @@ export default function UserManagementPage() {
 
   return (
     <div className="container mx-auto py-4">
+      {/* Search and Filter Controls */}
+      <div className="flex gap-4 mb-4">
+        <Input
+          type="text"
+          placeholder="Search users..."
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          className="w-1/3"
+        />
+        <Select value={roleFilter} onValueChange={setRoleFilter}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Filter by role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="student">Student</SelectItem>
+            <SelectItem value="provisional_pi">Provisional PI</SelectItem>
+            <SelectItem value="full_pi">Full PI</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Table */}
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -156,32 +197,40 @@ export default function UserManagementPage() {
               {headerGroup.headers.map((header) => (
                 <TableHead
                   key={header.id}
-                  className={header.column.columnDef.meta?.headerClassName}
+                  onClick={header.column.getToggleSortingHandler()}
+                  className={`cursor-pointer ${
+                    header.column.getIsSorted()
+                      ? header.column.getIsSorted() === "asc"
+                        ? "text-blue-500"
+                        : "text-red-500"
+                      : ""
+                  }`}
                 >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
+                  {header.column.getIsSorted() === "asc" && " ↑"}
+                  {header.column.getIsSorted() === "desc" && " ↓"}
                 </TableHead>
               ))}
             </TableRow>
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell
-                  key={cell.id}
-                  className={cell.column.columnDef.meta?.bodyClassName}
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
+          {table.getRowModel().rows
+            .filter((row) =>
+              roleFilter ? row.original.role === roleFilter : true
+            )
+            .map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </div>

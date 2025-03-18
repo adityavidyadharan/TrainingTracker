@@ -21,10 +21,10 @@ export default function Navbar() {
       </Link>
 
       {/* Navigation Links */}
-      <NavigationMenu className="hidden lg:flex" dir="rtl">
-        <NavigationMenuList className="space-x-4">
+      <NavigationMenu>
+        <NavigationMenuList>
           {isLoggedIn ? (
-            <>
+            <div className="flex items-center gap-4">
               <NavigationMenuItem>
                 <NavigationMenuLink asChild>
                   <Link to="/status">Training Status</Link>
@@ -45,7 +45,7 @@ export default function Navbar() {
                   <Link to="/roles">User Roles</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
-            </>
+            </div>
           ) : (
             <NavigationMenuItem>
               <NavigationMenuLink asChild>
@@ -59,22 +59,5 @@ export default function Navbar() {
       {/* Login Dropdown */}
       <LoginDropdown />
     </nav>
-  );
-}
-
-function NavLinks({ isLoggedIn }: { isLoggedIn: boolean }) {
-  return (
-    <div className="flex flex-col lg:flex-row lg:space-x-4">
-      {isLoggedIn ? (
-        <>
-          <Link to="/status" className="hover:underline">Training Status</Link>
-          <Link to="/training" className="hover:underline">Log Training</Link>
-          <Link to="/search" className="hover:underline">User Search</Link>
-          <Link to="/roles" className="hover:underline">User Roles</Link>
-        </>
-      ) : (
-        <Link to="/login" className="hover:underline">Login</Link>
-      )}
-    </div>
   );
 }

@@ -129,19 +129,6 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
     return prereqs.reverse();
   };
 
-  // Helper function to get badge variant based on status
-  const getBadgeVariant = (status: EventTypePlusNotStarted) => {
-    switch (status) {
-      case "completed":
-        return "default";
-      case "retrained":
-        return "destructive";
-      case "trained":
-      default:
-        return "secondary";
-    }
-  };
-
   return (
     <div className="max-w-4xl mx-auto mt-5">
       <Card>
@@ -157,12 +144,11 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
             <Accordion type="single" collapsible className="w-full">
               {sections.map((section, i) => (
                 <AccordionItem value={`item-${i}`} key={section.id}>
-                  <AccordionTrigger className="px-4">
+                  <AccordionTrigger className="px-4 no-underline">
                     <div className="flex justify-between w-full">
-                      <div className="font-medium">{section.name}</div>
+                      <div className="font-medium no-underline">{section.name}</div>
                       <Badge 
-                        variant={getBadgeVariant(progress[section.id])}
-                        className="ml-2"
+                        className={getBadgeVariant(progress[section.id])}
                       >
                         {progress[section.id]}
                       </Badge>

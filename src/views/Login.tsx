@@ -16,9 +16,8 @@ export default function Login() {
   }, [navigate]);
 
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center vh-100 bg-light">
-      <div className="card shadow-sm p-4" style={{ width: "100%", maxWidth: "400px" }}>
-        <h2 className="text-center mb-3">Login</h2>
+    <div className="bg-gray-100 h-screen flex items-center justify-center">
+      <div className="bg-white p-8 rounded-lg shadow-lg">
         <Auth
           supabaseClient={supabase}
           appearance={{ theme: ThemeSupa }}

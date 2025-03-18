@@ -25,12 +25,12 @@ export default function LoginDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">
+      <DropdownMenuTrigger>
+        <Button variant="outline" onClick={() => navigate("/profile")}>
           <Person className="mr-2" /> {user || "Account"}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent>
         {user ? (
           <>
             <DropdownMenuItem asChild>
