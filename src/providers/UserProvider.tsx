@@ -21,12 +21,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       if (user) {
         const { data, error } = await supabase
           .from("users")
-          .select("role") // Adjust this based on your schema
+          .select("name, role") // Adjust this based on your schema
           .eq("id", user.id)
           .single();
 
         if (!error) {
-          setUser({ ...user, user_role: data?.role });
+          setUser({ ...user, user_role: data?.role, name: data?.name });
         } else {
           console.error(error);
         }

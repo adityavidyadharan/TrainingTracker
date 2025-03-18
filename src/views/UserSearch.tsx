@@ -178,14 +178,7 @@ export default function UserSearch() {
       </div>
 
       {selectedUser && (
-        <Card className="mt-6 max-w-4xl mx-auto">
-          <CardHeader>
-            <CardTitle>Training Status for {selectedUser.name}</CardTitle>
-          </CardHeader>
-          <CardContent>
             <TrainingStatus user_id={selectedUser.id} />
-          </CardContent>
-        </Card>
       )}
     </div>
   );

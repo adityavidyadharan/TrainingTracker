@@ -131,57 +131,66 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-5">
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Training Sections</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex justify-center items-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin" />
-            </div>
-          ) : (
-            <Accordion type="single" collapsible className="w-full">
-              {sections.map((section, i) => (
-                <AccordionItem value={`item-${i}`} key={section.id}>
-                  <AccordionTrigger className="px-4 no-underline">
-                    <div className="flex justify-between w-full">
-                      <div className="font-medium no-underline">
-                        {section.name}
-                      </div>
-                      <Badge className={getBadgeVariant(progress[section.id])}>
-                        {progress[section.id]}
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pt-2">
-                    <div className="mb-4">
-                      <PrereqBadge prereqs={listPrereq(section.id)} />
-                    </div>
-                    <div className="space-y-4">
-                      {trainings[section.id] ? (
-                        trainings[section.id].map((training, idx) => (
-                          <TrainingCard
-                            training={training}
-                            idx={idx}
-                            key={idx}
-                            deleteTraining={deleteTraining}
-                          />
-                        ))
-                      ) : (
-                        <p className="text-muted-foreground">
-                          No steps recorded yet.
-                        </p>
-                      )}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+    <Card className="mt-6 max-w-4xl mx-auto container">
+      <CardHeader>
+        <CardTitle>Training Status for {currentUser?.name}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="max-w-4xl mx-auto mt-5">
+          <Card>
+            <CardHeader className="text-center">
+              <CardTitle className="text-xl">Training Sections</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="flex justify-center items-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin" />
+                </div>
+              ) : (
+                <Accordion type="single" collapsible className="w-full">
+                  {sections.map((section, i) => (
+                    <AccordionItem value={`item-${i}`} key={section.id}>
+                      <AccordionTrigger className="px-4 no-underline">
+                        <div className="flex justify-between w-full">
+                          <div className="font-medium no-underline">
+                            {section.name}
+                          </div>
+                          <Badge
+                            className={getBadgeVariant(progress[section.id])}
+                          >
+                            {progress[section.id]}
+                          </Badge>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-4 pt-2">
+                        <div className="mb-4">
+                          <PrereqBadge prereqs={listPrereq(section.id)} />
+                        </div>
+                        <div className="space-y-4">
+                          {trainings[section.id] ? (
+                            trainings[section.id].map((training, idx) => (
+                              <TrainingCard
+                                training={training}
+                                idx={idx}
+                                key={idx}
+                                deleteTraining={deleteTraining}
+                              />
+                            ))
+                          ) : (
+                            <p className="text-muted-foreground">
+                              No steps recorded yet.
+                            </p>
+                          )}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

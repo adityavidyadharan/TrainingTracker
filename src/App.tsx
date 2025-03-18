@@ -3,7 +3,6 @@ import "./App.css";
 import LandingPage from "./views/LandingPage";
 import TrainingStatus from "./views/TrainingStatus";
 import Login from "./views/Login";
-import Navbar from "./components/Navbar";
 import Profile from "./views/Profile";
 import { UserProvider } from "./providers/UserProvider";
 import LogTraining from "./views/LogTraining";
@@ -11,25 +10,34 @@ import OAuthHandler from "./views/OAuthHandler";
 import UserSearch from "./views/UserSearch";
 import UserRoles from "./views/admin/UserRoles";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
+import { AppSidebar } from "./components/AppSidebar";
+import Header from "./components/Header";
 
 function App() {
   const queryClient = new QueryClient();
   return (
     <BrowserRouter basename="/TrainingTracker">
       <QueryClientProvider client={queryClient}>
-        <UserProvider>
-          <Navbar />
-          <Routes>
-            <Route path="/oauth-redirect" element={<OAuthHandler />} />
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/training" element={<LogTraining />} />
-            <Route path="/status" element={<TrainingStatus />} />
-            <Route path="/search" element={<UserSearch />} />
-            <Route path="/roles" element={<UserRoles />} />
-          </Routes>
-        </UserProvider>
+        <SidebarProvider>
+          <AppSidebar />
+          <UserProvider>
+            <SidebarInset>
+
+            <Header />
+            <Routes>
+              <Route path="/oauth-redirect" element={<OAuthHandler />} />
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/training" element={<LogTraining />} />
+              <Route path="/status" element={<TrainingStatus />} />
+              <Route path="/search" element={<UserSearch />} />
+              <Route path="/roles" element={<UserRoles />} />
+            </Routes>
+            </SidebarInset>
+          </UserProvider>
+         </SidebarProvider>
       </QueryClientProvider>
     </BrowserRouter>
   );
