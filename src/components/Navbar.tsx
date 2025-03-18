@@ -1,56 +1,80 @@
-import { Navbar as BNavbar, Container, Nav } from "react-bootstrap";
-import { Link } from "react-router";
-import LoginDropdown from "./LoginDropdown";
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import supabase from "../clients/supabase";
+import LoginDropdown from "./LoginDropdown";
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink } from "@radix-ui/react-navigation-menu";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange(
-      (_, session) => {
-        setIsLoggedIn(session !== null);
-      }
-    );
+    supabase.auth.onAuthStateChange((_, session) => {
+      setIsLoggedIn(session !== null);
+    });
   }, []);
 
   return (
-    <BNavbar bg="light" expand="lg">
-      <Container>
-        <BNavbar.Brand>
-          <Link to="/" className="nav-link">
-            <BNavbar.Brand>ISGT Training Tracker</BNavbar.Brand>
-          </Link>
-        </BNavbar.Brand>
-        <BNavbar.Toggle aria-controls="basic-navbar-nav" />
-        <BNavbar.Collapse id="basic-navbar-nav">
-          <Nav className="mr-auto">
-            {isLoggedIn ? (
-              <>
-                <Link to="/status" className="nav-link">
-                  Training Status
-                </Link>
-                <Link to="/training" className="nav-link">
-                  Log Training
-                </Link>
-                <Link to="/search" className="nav-link">
-                  User Search
-                </Link>
-                <Link to="/roles" className="nav-link">
-                  User Roles
-                </Link>
-              </>
-            ) :(
-            <Link to="/login" className="nav-link">
-              Login
-            </Link>)}
-          </Nav>
-        </BNavbar.Collapse>
-        <BNavbar.Collapse className="justify-content-end">
-            <LoginDropdown />
-        </BNavbar.Collapse>
-      </Container>
-    </BNavbar>
+    <nav className="flex items-center justify-between p-4 border-b shadow-sm">
+      {/* Brand */}
+      <Link to="/" className="text-lg font-semibold">
+        ISGT Training Tracker
+      </Link>
+
+      {/* Navigation Links */}
+      <NavigationMenu className="hidden lg:flex" dir="rtl">
+        <NavigationMenuList className="space-x-4">
+          {isLoggedIn ? (
+            <>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link to="/status">Training Status</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link to="/training">Log Training</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link to="/search">User Search</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link to="/roles">User Roles</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </>
+          ) : (
+            <NavigationMenuItem>
+              <NavigationMenuLink asChild>
+                <Link to="/login">Login</Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          )}
+        </NavigationMenuList>
+      </NavigationMenu>
+
+      {/* Login Dropdown */}
+      <LoginDropdown />
+    </nav>
+  );
+}
+
+function NavLinks({ isLoggedIn }: { isLoggedIn: boolean }) {
+  return (
+    <div className="flex flex-col lg:flex-row lg:space-x-4">
+      {isLoggedIn ? (
+        <>
+          <Link to="/status" className="hover:underline">Training Status</Link>
+          <Link to="/training" className="hover:underline">Log Training</Link>
+          <Link to="/search" className="hover:underline">User Search</Link>
+          <Link to="/roles" className="hover:underline">User Roles</Link>
+        </>
+      ) : (
+        <Link to="/login" className="hover:underline">Login</Link>
+      )}
+    </div>
   );
 }

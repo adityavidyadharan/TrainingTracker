@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Button, NavDropdown } from "react-bootstrap";
+import { Link, useNavigate } from "react-router";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Person } from "react-bootstrap-icons";
 import supabase from "../clients/supabase";
-import { Link, useNavigate } from "react-router";
 
 export default function LoginDropdown() {
   const [user, setUser] = useState<string | null>(null);
@@ -23,33 +24,28 @@ export default function LoginDropdown() {
   };
 
   return (
-    <NavDropdown
-      title={
-        <span>
-          <Person className="me-2" /> {user || "Account"}
-        </span>
-      }
-      align="end"
-    >
-      {user ? (
-        <>
-          <NavDropdown.Item as={Link} to="/profile">
-            Profile
-          </NavDropdown.Item>
-          <NavDropdown.Item
-            as={Button}
-            variant="link"
-            onClick={handleLogout}
-            className="text-danger w-100"
-          >
-            Logout
-          </NavDropdown.Item>
-        </>
-      ) : (
-        <NavDropdown.Item as={Link} to="/login">
-          Login
-        </NavDropdown.Item>
-      )}
-    </NavDropdown>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline">
+          <Person className="mr-2" /> {user || "Account"}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {user ? (
+          <>
+            <DropdownMenuItem asChild>
+              <Link to="/profile">Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout} className="text-danger cursor-pointer">
+              Logout
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <DropdownMenuItem asChild>
+            <Link to="/login">Login</Link>
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

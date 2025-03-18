@@ -1,10 +1,18 @@
 import { EventTypePlusNotStarted } from "../types/responses";
 
-export default function getBadgeClass(event?: EventTypePlusNotStarted): string {
-  if (!event) return "bg-secondary";
+export default function getBadgeVariant(event?: EventTypePlusNotStarted): "default" | "secondary" | "destructive" {
+  if (!event) return "secondary";
   const lower = event.toLowerCase();
-  if (lower === "completed") return "bg-success";
-  if (lower === "trained") return "bg-primary";
-  if (lower === "retrained") return "bg-warning text-dark";
-  return "bg-secondary";
+  switch (lower) {
+    case "not started":
+      return "secondary";
+    case "completed":
+      return "default";
+    case "trained":
+      return "secondary";
+    case "retrained":
+      return "destructive";
+    default:
+      return "default";
+  }
 };

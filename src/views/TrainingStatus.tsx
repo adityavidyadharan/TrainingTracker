@@ -1,13 +1,4 @@
 import { useEffect, useState } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Accordion,
-  Badge,
-  Spinner,
-} from "react-bootstrap";
 import supabase from "../clients/supabase";
 import {
   EventTypePlusNotStarted,
@@ -17,8 +8,19 @@ import {
 } from "../types/responses";
 import PrereqBadge from "../components/PrereqBadge";
 import { useUser } from "../providers/UserProvider";
-import getBadgeClass from "../utility/BadgeColors";
+import getBadgeVariant from "../utility/BadgeColors";
 import TrainingCard from "../components/TrainingCard";
+
+// Shadcn UI Components
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
 
 export default function TrainingStatus({ user_id }: { user_id?: string }) {
   const [sections, setSections] = useState<Section[]>([]);
@@ -27,6 +29,7 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
   >({});
   const [progress, setProgress] = useState<Record<number, EventTypePlusNotStarted>>({});
   const [loading, setLoading] = useState(true);
+  
   let user: string;
   const currentUser = useUser().user;
   if (user_id) {
@@ -55,6 +58,7 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
       .select("*, pi:users!pi_id(name)")
       .eq("student_id", user)
       .order("timestamp", { ascending: true });
+      
     if (trainingError) {
       console.error("Error fetching trainings:", error);
     } else {
@@ -66,6 +70,7 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
         }
         trainingsObj[training.section_id].push(training);
       });
+      
       Object.keys(trainingsObj).forEach((key) => {
         const sectionId = parseInt(key);
         trainingsObj[sectionId].sort(
@@ -77,13 +82,14 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
           }
         );
       });
+      
       setTrainings(trainingsObj);
+      
       // Determine progress for each section
       const progressObj: Record<number, EventTypePlusNotStarted> = {};
       sectionsData.forEach((section) => {
         if (trainingsObj[section.id]) {
-          const lastTraining =
-            trainingsObj[section.id][0];
+          const lastTraining = trainingsObj[section.id][0];
           progressObj[section.id] = lastTraining.event_type;
         } else {
           progressObj[section.id] = "not started";
@@ -105,7 +111,6 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
       fetchInfo();
     }
   };
-
   
   useEffect(() => {
     fetchInfo();
@@ -124,67 +129,72 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
     return prereqs.reverse();
   };
 
+  // Helper function to get badge variant based on status
+  const getBadgeVariant = (status: EventTypePlusNotStarted) => {
+    switch (status) {
+      case "completed":
+        return "default";
+      case "retrained":
+        return "destructive";
+      case "trained":
+      default:
+        return "secondary";
+    }
+  };
+
   return (
-    <Container className="mt-5">
-      <Row className="justify-content-md-center">
-        <Col md={10}>
-          <Card>
-            <Card.Header as="h3" className="text-center">
-              Training Sections
-            </Card.Header>
-            <Card.Body>
-              {loading ? (
-                <div className="text-center">
-                  <Spinner animation="border" role="status" />
-                </div>
-              ) : (
-                <Accordion>
-                  {sections.map((section, i) => (
-                    <Accordion.Item eventKey={i.toString()} key={section.id}>
-                      <Accordion.Header>
-                        <Row className="w-100">
-                          <Col xs={6} md={6}>
-                            <strong>{section.name}</strong>
-                          </Col>
-                          <Col xs={6} md={6} className="text-end">
-                            <Badge
-                              className={getBadgeClass(progress[section.id])}
-                              pill
-                            >
-                              {progress[section.id]}
-                            </Badge>
-                          </Col>
-                        </Row>
-                      </Accordion.Header>
-                      <Accordion.Body>
-                        <Row>
-                          <PrereqBadge prereqs={listPrereq(section.id)} />
-                        </Row>
-                        <Row>
-                          {trainings[section.id] ? (
-                            trainings[section.id].map((training, idx) => (
-                              <TrainingCard
-                                training={training}
-                                idx={idx}
-                                key={idx}
-                                deleteTraining={deleteTraining}
-                              />
-                            ))
-                          ) : (
-                            <p className="text-muted mb-0">
-                              No steps recorded yet.
-                            </p>
-                          )}
-                        </Row>
-                      </Accordion.Body>
-                    </Accordion.Item>
-                  ))}
-                </Accordion>
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+    <div className="max-w-4xl mx-auto mt-5">
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="text-xl">Training Sections</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : (
+            <Accordion type="single" collapsible className="w-full">
+              {sections.map((section, i) => (
+                <AccordionItem value={`item-${i}`} key={section.id}>
+                  <AccordionTrigger className="px-4">
+                    <div className="flex justify-between w-full">
+                      <div className="font-medium">{section.name}</div>
+                      <Badge 
+                        variant={getBadgeVariant(progress[section.id])}
+                        className="ml-2"
+                      >
+                        {progress[section.id]}
+                      </Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pt-2">
+                    <div className="mb-4">
+                      <PrereqBadge prereqs={listPrereq(section.id)} />
+                    </div>
+                    <div className="space-y-4">
+                      {trainings[section.id] ? (
+                        trainings[section.id].map((training, idx) => (
+                          <TrainingCard
+                            training={training}
+                            idx={idx}
+                            key={idx}
+                            deleteTraining={deleteTraining}
+                          />
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground">
+                          No steps recorded yet.
+                        </p>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

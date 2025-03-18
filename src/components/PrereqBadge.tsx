@@ -1,19 +1,22 @@
-import { Badge } from "react-bootstrap";
+import { Badge } from "@/components/ui/badge";
 import { SectionWithProgress } from "../types/responses";
-import getBadgeClass from "../utility/BadgeColors";
+import getBadgeVariant from "../utility/BadgeColors";
 
 export default function PrereqBadge({ prereqs }: { prereqs: SectionWithProgress[] }) {
   return (
-    <div>
+    <div className="flex flex-wrap items-center gap-1">
       <span>Prerequisites: </span>
       {prereqs.length > 0 ? (
         prereqs.map((prereq) => (
-          <Badge key={prereq.id} className={`${getBadgeClass(prereq.progress)} ms-1`} pill>
+          <Badge 
+            key={prereq.id} 
+            variant={getBadgeVariant(prereq.progress)}
+          >
             {prereq.name}
           </Badge>
         ))
       ) : (
-        <Badge className="bg-secondary ms-1" pill>
+        <Badge variant="secondary">
           None
         </Badge>
       )}

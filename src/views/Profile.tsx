@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import supabase from "../clients/supabase";
 import { Container, Card, Button, Spinner } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router";
 import { useUser } from "../providers/UserProvider";
 

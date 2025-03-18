@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Button, Spinner, Alert, Table, Card, Container } from 'react-bootstrap';
+import { useSearchParams } from 'react-router';
 import supabase from '../clients/supabase';
 import { Tables } from '../types/db';
 import TrainingStatus from './TrainingStatus';
-import { useSearchParams } from 'react-router';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2 } from 'lucide-react';
 
 type User = Pick<Tables<'users'>, 'id' | 'name' | 'email'>;
 
@@ -59,7 +66,7 @@ export default function UserSearch() {
         .select('id, name, email')
         .or(
           `name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`
-        )
+        );
 
       if (supabaseError) {
         throw supabaseError;
@@ -74,73 +81,85 @@ export default function UserSearch() {
   };
 
   return (
-    <Container>
+    <div className="container mx-auto py-4">
+      <div className="max-w-2xl mx-auto px-4">
+        <h3 className="text-2xl font-bold mb-4">User Lookup & Training Status</h3>
 
-    
-    <div style={{ maxWidth: 600, margin: '0 auto', padding: '1rem' }}>
-      <h3>User Lookup & Training Status</h3>
+        <form onSubmit={handleSearch} className="space-y-4 mb-6">
+          <div className="space-y-2">
+            <Label htmlFor="searchQuery">Search by Name or Email</Label>
+            <Input
+              id="searchQuery"
+              type="text"
+              placeholder="Enter text..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <Button type="submit" disabled={loading} className="w-full sm:w-auto">
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Searching
+              </>
+            ) : (
+              'Search'
+            )}
+          </Button>
+        </form>
 
-      <Form onSubmit={handleSearch} className="mb-4">
-        <Form.Group controlId="searchQuery">
-          <Form.Label>Search by Name or Email</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter text..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </Form.Group>
-        <Button type="submit" className="mt-2" disabled={loading}>
-          {loading ? <Spinner animation="border" size="sm" /> : 'Search'}
-        </Button>
-      </Form>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
-      {error && <Alert variant="danger">{error}</Alert>}
-
-      {users.length > 0 && !selectedUser && (
-        <Table bordered hover size="sm">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th style={{ width: '140px' }}>View Log</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td>{u.name}</td>
-                <td>{u.email}</td>
-                <td>
-                  <Button
-                    variant="info"
-                    onClick={() => {
-                      const url = new URL(window.location.href);
-                      url.searchParams.set('sid', u.id.toString());
-                      window.history.pushState({}, '', url.toString());
-                      setSelectedUser(u);
-                    }}
-                  >
-                    View
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
+        {users.length > 0 && !selectedUser && (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead className="w-[140px]">View Log</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((u) => (
+                  <TableRow key={u.id}>
+                    <TableCell>{u.name}</TableCell>
+                    <TableCell>{u.email}</TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          const url = new URL(window.location.href);
+                          url.searchParams.set('sid', u.id.toString());
+                          window.history.pushState({}, '', url.toString());
+                          setSelectedUser(u);
+                        }}
+                      >
+                        View
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
 
       {selectedUser && (
-        <Card className="mt-4">
-          <Card.Header>
-            Training Status for {selectedUser.name}
-          </Card.Header>
-          <Card.Body>
+        <Card className="mt-6 max-w-4xl mx-auto">
+          <CardHeader>
+            <CardTitle>Training Status for {selectedUser.name}</CardTitle>
+          </CardHeader>
+          <CardContent>
             <TrainingStatus user_id={selectedUser.id} />
-          </Card.Body>
+          </CardContent>
         </Card>
       )}
-    </Container>
+    </div>
   );
-};
+}

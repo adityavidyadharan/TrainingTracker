@@ -1,9 +1,14 @@
-import { Card, Row, Col, Badge, Button, Spinner } from "react-bootstrap";
-import getBadgeClass from "../utility/BadgeColors";
-import { TrainingHistorical } from "../types/responses";
-import { useUser } from "../providers/UserProvider";
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useUser } from "../providers/UserProvider";
+import { TrainingHistorical } from "../types/responses";
+import { Loader2 } from "lucide-react";
+
+// Shadcn UI components
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import getBadgeVariant from "../utility/BadgeColors";
 
 export default function TrainingCard({
   training,
@@ -17,7 +22,9 @@ export default function TrainingCard({
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const user = useUser().user;
+  
   if (!user) return null;
+  
   const canModify = user.role === "admin" || user.id === training.pi_id;
 
   const handleEdit = () => {
@@ -31,46 +38,52 @@ export default function TrainingCard({
   };
 
   return (
-    <Card key={idx} className="mt-2">
-      <Card.Body>
-        <Row className="align-items-center">
-          <Col md={3}>
-            <Badge className={getBadgeClass(training.event_type)} pill>
+    <Card key={idx} className="mb-2">
+      <CardContent className="p-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center">
+          <div>
+            <Badge variant={getBadgeVariant(training.event_type)}>
               {training.event_type}
             </Badge>
-          </Col>
-          <Col md={3}>
-            <small className="text-muted">
+          </div>
+          
+          <div>
+            <span className="text-sm text-muted-foreground">
               Date: {new Date(training.timestamp).toLocaleDateString()}
-            </small>
-          </Col>
-          <Col md={3}>
-            <small className="text-muted">
+            </span>
+          </div>
+          
+          <div>
+            <span className="text-sm text-muted-foreground">
               Trained/Tested By:
               <br /> {training.pi.name}
-            </small>
-          </Col>
+            </span>
+          </div>
+          
           {canModify && (
-            <Col md={3} className="text-end">
-              <small className="text-muted">
-                <Button className="me-2" onClick={handleEdit}>
-                  Edit
+            <div className="flex justify-start md:justify-end gap-2">
+              <Button size="sm" variant="outline" onClick={handleEdit}>
+                Edit
+              </Button>
+              
+              {loading ? (
+                <Button size="sm" variant="destructive" disabled>
+                  <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                  Deleting
                 </Button>
-                {loading ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  <Button
-                    variant="danger"
-                    onClick={() => handleDelete(training.id)}
-                  >
-                    Delete
-                  </Button>
-                )}
-              </small>
-            </Col>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDelete(training.id)}
+                >
+                  Delete
+                </Button>
+              )}
+            </div>
           )}
-        </Row>
-      </Card.Body>
+        </div>
+      </CardContent>
     </Card>
   );
 }
