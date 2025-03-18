@@ -5,7 +5,6 @@ import TrainingStatus from "./TrainingStatus";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
 import { useUsers } from "../utility/SupabaseOperations";

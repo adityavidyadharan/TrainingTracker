@@ -26,8 +26,9 @@ function App() {
 
             <Header />
             <Routes>
-              <Route path="/oauth-redirect" element={<OAuthHandler />} />
               <Route path="/" element={<LandingPage />} />
+              <Route path="/oauth-redirect" element={<OAuthHandler />} />
+              <Route path="/home" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/training" element={<LogTraining />} />

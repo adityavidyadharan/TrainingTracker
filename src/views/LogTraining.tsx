@@ -4,7 +4,7 @@ import supabase from "../clients/supabase";
 import { EventType } from "../types/responses";
 import { useLocation, useNavigate } from "react-router";
 import { Tables } from "../types/db";
-import { lookupSection, lookupStudent } from "../utility/SupabaseOperations";
+import { lookupSection, lookupStudent, QueryError, useSections, useUsers } from "../utility/SupabaseOperations";
 import { DateTime } from "luxon";
 
 import { Input } from "@/components/ui/input";
@@ -19,14 +19,14 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 
 export default function LogTraining() {
   const [trainingId, setTrainingId] = useState<number | null>(null);
   const [emails, setEmails] = useState([""]);
-  const [toolGroups, setToolGroups] = useState<{ id: number; name: string }[]>(
-    [],
-  );
+  // const [toolGroups, setToolGroups] = useState<{ id: number; name: string }[]>(
+  //   [],
+  // );
   const [selectedToolGroup, setSelectedToolGroup] = useState<number | null>(
     null,
   );
@@ -67,17 +67,30 @@ export default function LogTraining() {
     populateInfo();
   }, [existingData]);
 
-  useEffect(() => {
-    const fetchToolGroups = async () => {
-      const { data, error } = await supabase
-        .from("sections")
-        .select("id, name")
-        .eq("active", true);
-      if (error) console.error("Error fetching tool groups:", error);
-      else setToolGroups(data || []);
-    };
-    fetchToolGroups();
-  }, []);
+  const {
+    data: toolGroups,
+    error: toolGroupError,
+    loading: toolGroupsLoading,
+  } = useSections()
+
+  if (toolGroupError) {
+    return (
+      <QueryError error={toolGroupError} entity="tool groups" />
+    )
+  }
+  
+
+  const {
+    data: users,
+    error: usersError,
+    loading: usersLoading,
+  } = useUsers();
+
+  if (usersError) {
+    return <QueryError error={usersError} entity="users" />;
+  }
+
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,22 +102,43 @@ export default function LogTraining() {
       return;
     }
 
-    const { data: students, error: studentError } = await supabase
-      .from("users")
-      .select("id, email")
-      .in(
-        "email",
-        emails.filter((email) => email.trim() !== ""),
-      );
+    // const { data: students, error: studentError } = await supabase
+    //   .from("users")
+    //   .select("id, email")
+    //   .in(
+    //     "email",
+    //     emails.filter((email) => email.trim() !== ""),
+    //   );
 
-    if (studentError || !students || students.length === 0) {
+    // if (studentError || !students || students.length === 0) {
+    //   setError(
+    //     "Some or all student emails were not found. Please check and try again.",
+    //   );
+    //   return;
+    // }
+    if (!selectedToolGroup) {
+      setError("Please select a tool group.");
+      return;
+    }
+
+    const students = users?.filter((user) =>
+      emails.includes(user.email),
+    );
+    const invalidStudents = emails.filter(
+      (email) => !students?.find((student) => student.email === email),
+    );
+
+    if (invalidStudents.length) {
       setError(
-        "Some or all student emails were not found. Please check and try again.",
+        `The following student emails were not found: ${invalidStudents.join(
+          ", ",
+        )}`,
       );
       return;
     }
-    if (!selectedToolGroup) {
-      setError("Please select a tool group.");
+
+    if (!students || students.length === 0) {
+      setError("No students found with the provided emails.");
       return;
     }
 
@@ -160,6 +194,12 @@ export default function LogTraining() {
         <h2 className="text-2xl font-bold text-center mb-6">
           Log Training Event
         </h2>
+
+        {usersLoading || toolGroupsLoading || !users || !toolGroups ? (
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
@@ -288,6 +328,7 @@ export default function LogTraining() {
             {isEdit ? "Update Training Event" : "Log Training Event"}
           </Button>
         </form>
+        )}
       </div>
     </div>
   );

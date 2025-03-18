@@ -1,8 +1,6 @@
 import {
-  Calendar,
   CircleUser,
   Home,
-  Inbox,
   ListCheck,
   Search,
   Settings,
@@ -19,7 +17,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 // Menu items.
 const items = [
@@ -39,6 +37,8 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const location = useLocation();
+  const url = location.pathname;
   return (
     <Sidebar>
       <SidebarContent>
@@ -47,15 +47,15 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive>
-                <Link to="/">
+              <SidebarMenuButton asChild isActive={url === "/home"}>
+                <Link to="/home">
                   <Home size={24} />
                   <span>Home</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton asChild isActive={url === "/status"}>
                 <Link to="/status">
                   <ListCheck size={24} />
                   <span>Training Status</span>
@@ -63,7 +63,7 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild>
+              <SidebarMenuButton asChild isActive={url === "/profile"}>
                 <Link to="/profile">
                   <CircleUser size={24} />
                   <span>Profile</span>
@@ -80,7 +80,7 @@ export function AppSidebar() {
               <SidebarMenu>
                 {item.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton asChild isActive={url === item.url}>
                       <Link to={item.url}>
                         <item.icon size={24} />
                         <span>{item.title}</span>
