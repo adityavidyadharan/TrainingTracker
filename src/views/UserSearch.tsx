@@ -1,152 +1,179 @@
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router';
-import supabase from '../clients/supabase';
-import { Tables } from '../types/db';
-import TrainingStatus from './TrainingStatus';
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
+import { Tables } from "../types/db";
+import TrainingStatus from "./TrainingStatus";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
+import { useUsers } from "../utility/SupabaseOperations";
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import DataTable from "../components/DataTable";
+import { useQueryClient } from "@tanstack/react-query";
+import TablePagination from "../components/TablePagination";
 
-type User = Pick<Tables<'users'>, 'id' | 'name' | 'email'>;
+type User = Pick<Tables<"users">, "id" | "name" | "email">;
 
 export default function UserSearch() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const queryClient = useQueryClient();
+  const [globalFilter, setGlobalFilter] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const [searchParams] = useSearchParams();
 
+  const { data: users = [], isFetching, isLoading, isError } = useUsers();
+
   useEffect(() => {
-    const student_id = searchParams.get('sid');
+    const student_id = searchParams.get("sid");
+    if (isLoading) return;
     if (student_id) {
       (async () => {
-        const { data, error: supabaseError } = await supabase
-          .from('users')
-          .select('id, name, email')
-          .eq('id', student_id);
-
-        if (supabaseError) {
-          setError(supabaseError.message);
+        const user = users.find((u) => u.id === student_id);
+        if (user) {
+          setSelectedUser(user);
+          setGlobalFilter(user.name);
+        } else {
+          setError("User not found");
         }
-
-        if (data) {
-          setSelectedUser(data[0]);
-          setSearchQuery(data[0].email);
-        }
-      })();
+      })(); 
+    } else {
+      setSelectedUser(null);
     }
-  }, [searchParams]);
+  }, [searchParams, users]);
 
-  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-    setUsers([]);
-    setSelectedUser(null);
+  const columnHelper = createColumnHelper<User>();
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("name", {
+        header: "Name",
+        cell: (row) => row.getValue(),
+        enableSorting: true,
+      }),
+      columnHelper.accessor("email", {
+        header: "Email",
+        cell: (row) => row.getValue(),
+        enableSorting: true,
+      }),
+      columnHelper.display({
+        header: "View Log",
+        cell: (info) => (
+          <Button
+            size="sm"
+            onClick={() => {
+              const url = new URL(window.location.href);
+              url.searchParams.set("sid", info.row.original.id.toString());
+              window.history.pushState({}, "", url.toString());
+              setSelectedUser(info.row.original);
+              setGlobalFilter(info.row.original.name);
+            }}
+          >
+            View
+          </Button>
+        ),
+        enableGlobalFilter: false,
+      }),
+    ],
+    [columnHelper]
+  );
 
-    const url = new URL(window.location.href);
-    url.searchParams.delete('sid');
-    window.history.pushState({}, '', url.toString());
+  const table = useReactTable({
+    columns,
+    data: users,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
+    state: {
+      globalFilter,
+      pagination
+    },
+    onGlobalFilterChange: setGlobalFilter,
+  });
 
-    try {
-      if (!searchQuery.trim()) {
-        setLoading(false);
-        return;
-      }
-
-      const { data, error: supabaseError } = await supabase
-        .from('users')
-        .select('id, name, email')
-        .or(
-          `name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`
-        );
-
-      if (supabaseError) {
-        throw supabaseError;
-      }
-
-      setUsers(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const pages = table.getPageCount();
 
   return (
     <div className="container mx-auto py-4">
       <div className="max-w-2xl mx-auto px-4">
-        <h3 className="text-2xl font-bold mb-4">User Lookup & Training Status</h3>
-
-        <form onSubmit={handleSearch} className="space-y-4 mb-6">
-          <div className="space-y-2">
-            <Label htmlFor="searchQuery">Search by Name or Email</Label>
-            <Input
-              id="searchQuery"
-              type="text"
-              placeholder="Enter text..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <Button type="submit" disabled={loading} className="w-full sm:w-auto">
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Searching
-              </>
+        <h3 className="text-2xl font-bold mb-4">
+          User Lookup & Training Status
+        </h3>
+        <div className="flex gap-4 mb-4">
+          <Input
+            type="text"
+            placeholder="Search users..."
+            value={globalFilter}
+            onChange={(e) => {
+              setGlobalFilter(e.target.value);
+              setSelectedUser(null);
+            }}
+            className="w-1/3"
+            disabled={isLoading}
+          />
+          {globalFilter && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setGlobalFilter("");
+                setSelectedUser(null);
+                const url = new URL(window.location.href);
+                url.searchParams.delete("sid");
+                window.history.pushState({}, "", url.toString());
+              }}
+            >
+              Clear
+            </Button>
+          )}
+          <Button
+            className="cursor-pointer"
+            onClick={() =>
+              queryClient.invalidateQueries({ queryKey: ["users"] })
+            }
+            disabled={isLoading}
+          >
+            {isFetching ? (
+              <Loader2 className="h-6 w-6 animate-spin" />
             ) : (
-              'Search'
+              "Refresh"
             )}
           </Button>
-        </form>
+        </div>
 
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-
-        {users.length > 0 && !selectedUser && (
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead className="w-[140px]">View Log</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((u) => (
-                  <TableRow key={u.id}>
-                    <TableCell>{u.name}</TableCell>
-                    <TableCell>{u.email}</TableCell>
-                    <TableCell>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          const url = new URL(window.location.href);
-                          url.searchParams.set('sid', u.id.toString());
-                          window.history.pushState({}, '', url.toString());
-                          setSelectedUser(u);
-                        }}
-                      >
-                        View
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+        {isError && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{isError}</AlertDescription>
+          </Alert>
+        )}
+        {!selectedUser && (
+          <>
+            <DataTable table={table} isLoading={isLoading} />
+            <TablePagination
+              pagination={pagination}
+              users={users}
+              pages={pages}
+              table={table}
+            />
+          </>
         )}
       </div>
 
