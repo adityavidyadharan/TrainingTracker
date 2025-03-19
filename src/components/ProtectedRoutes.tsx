@@ -11,8 +11,7 @@ export default function ProtectedRoutes({
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Don't redirect on the home page `/`
-  const isHomePage = location.pathname === "/";
+  const isHomePage = location.pathname === "/home";
   const isLoginRedirect = location.pathname === "/profile";
 
   useEffect(() => {

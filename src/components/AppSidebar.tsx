@@ -2,6 +2,7 @@ import {
   CircleUser,
   Home,
   ListCheck,
+  LogOut,
   Search,
   Settings,
   SquarePen,
@@ -82,6 +83,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               )}
               {isLoggedIn ? (
+                <>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={url === "/profile"}>
                     <Link to="/profile">
@@ -90,6 +92,15 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={url === "/logout"}>
+                    <Link to="/logout">
+                      <LogOut size={24} />
+                      <span>Logout</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                </>
               ) : (
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild isActive={url === "/login"}>

@@ -45,7 +45,7 @@ export default function Profile() {
               </p>
               <Button
                 variant="destructive"
-                className="w-full mt-6"
+                className="w-full mt-6 cursor-pointer"
                 onClick={handleLogout}
               >
                 Logout

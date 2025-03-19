@@ -13,6 +13,7 @@ import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
 import { AppSidebar } from "./components/AppSidebar";
 import Header from "./components/Header";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import Logout from "./views/Logout";
 
 function App() {
   const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ function App() {
                   <Route path="/status" element={<TrainingStatus />} />
                   <Route path="/search" element={<UserSearch />} />
                   <Route path="/roles" element={<UserRoles />} />
+                  <Route path="/logout" element={<Logout />} />
                 </Routes>
               </ProtectedRoutes>
             </SidebarInset>
