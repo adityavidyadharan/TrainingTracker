@@ -7,18 +7,18 @@ export default function ProtectedRoutes({
 }: {
   children: React.ReactNode;
 }) {
-  const { user } = useUser();
+  const { user, loading } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
 
+  
   const isHomePage = location.pathname === "/home";
   const isLoginRedirect = location.pathname === "/profile";
-
   useEffect(() => {
-    if (!user && !isHomePage && !isLoginRedirect) {
+    if (!user && !isHomePage && !isLoginRedirect && !loading) {
       navigate("/login");
     }
   }, [user, navigate, isHomePage]);
-
+  
   return children;
 }

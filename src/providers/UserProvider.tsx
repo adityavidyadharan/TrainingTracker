@@ -3,7 +3,8 @@ import supabase from "../clients/supabase";
 import { RoledUser, UserRoles } from "../types/responses";
 import { jwtDecode } from "jwt-decode";
 
-const UserContext = createContext<{ user: RoledUser | null }>({
+const UserContext = createContext<{ user: RoledUser | null, loading: boolean }>({
+  loading: true,
   user: null,
 });
 
@@ -14,9 +15,11 @@ type JWT = {
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<RoledUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSession = async () => {
+      setLoading(true);
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -30,12 +33,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           name: session.user.user_metadata.full_name,
         });
       }
+      setLoading(false);
     };
 
     fetchSession();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_, session) => {
+        setLoading(true);
         if (session?.user) {
           const jwt = jwtDecode<JWT>(session.access_token);
           const role = jwt.user_role;
@@ -49,6 +54,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         } else {
           setUser(null);
         }
+        setLoading(false);
       },
     );
 
@@ -56,7 +62,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ user, loading }}>{children}</UserContext.Provider>
   );
 }
 
