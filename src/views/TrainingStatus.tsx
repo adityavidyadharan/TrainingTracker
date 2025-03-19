@@ -32,7 +32,6 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
   >({});
   const [loading, setLoading] = useState(true);
 
-  
   const currentUser = useUser().user;
   const user = user_id ?? currentUser?.id ?? null;
 

@@ -30,7 +30,7 @@ const items = [
       { title: "User Search", url: "/search", icon: Search },
       { title: "Log Training", url: "/training", icon: SquarePen },
     ],
-    roles: ["admin", "full_pi", "provisional_pi"]
+    roles: ["admin", "full_pi", "provisional_pi"],
   },
   {
     title: "Admin",

@@ -1,9 +1,9 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import supabase from "../clients/supabase";
 import { RoledUser, UserRoles } from "../types/responses";
-import { jwtDecode } from 'jwt-decode'
+import { jwtDecode } from "jwt-decode";
 
-const UserContext = createContext<{ user: RoledUser | null, loading: boolean }>(
+const UserContext = createContext<{ user: RoledUser | null; loading: boolean }>(
   {
     user: null,
     loading: true,
@@ -21,7 +21,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const fetchSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
       if (session?.user) {
         const jwt = jwtDecode<JWT>(session.access_token);
@@ -37,7 +39,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
     fetchSession();
 
-
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_, session) => {
         if (session?.user) {
@@ -45,7 +46,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           const role = jwt.user_role;
           const email = jwt.user_email;
           setLoading(false);
-          setUser({ ...session.user, user_role: role, email, name: session.user.user_metadata.full_name });
+          setUser({
+            ...session.user,
+            user_role: role,
+            email,
+            name: session.user.user_metadata.full_name,
+          });
         } else {
           setUser(null);
         }

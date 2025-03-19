@@ -55,7 +55,7 @@ const useSections = () => {
   });
 };
 
-const QueryError = ({ error, entity }: { error: Error, entity: string }) => {
+const QueryError = ({ error, entity }: { error: Error; entity: string }) => {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="max-w-3xl mx-auto">
@@ -68,7 +68,7 @@ const QueryError = ({ error, entity }: { error: Error, entity: string }) => {
       </div>
     </div>
   );
-} 
+};
 
 const lookupSection = async (sectionId: number) => {
   return supabase

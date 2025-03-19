@@ -176,9 +176,7 @@ export default function UserSearch() {
         )}
       </div>
 
-      {selectedUser && (
-            <TrainingStatus user_id={selectedUser.id} />
-      )}
+      {selectedUser && <TrainingStatus user_id={selectedUser.id} />}
     </div>
   );
 }

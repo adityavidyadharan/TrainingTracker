@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../providers/UserProvider";
 import supabase from "../clients/supabase";
-import { EventType } from "../types/responses";
 import { useLocation, useNavigate } from "react-router";
 import { Tables } from "../types/db";
-import { lookupSection, lookupStudent, QueryError, useSections, useUsers } from "../utility/SupabaseOperations";
+import {
+  QueryError,
+  useSections,
+  useUsers,
+} from "../utility/SupabaseOperations";
 import { DateTime } from "luxon";
 import { z } from "zod";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -32,11 +35,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-  emails: z.array(
-    z.object({
-      value: z.string().email("Please enter a valid email address")
-    })
-  ).min(1, "At least one email is required"),
+  emails: z
+    .array(
+      z.object({
+        value: z.string().email("Please enter a valid email address"),
+      }),
+    )
+    .min(1, "At least one email is required"),
   toolGroup: z.string().min(1, "Please select a tool group"),
   eventType: z.enum(["trained", "retrained", "completed"]),
   notes: z.string().optional(),
@@ -103,22 +108,27 @@ export default function LogTraining() {
       if (existingData) {
         setTrainingId(existingData.id);
         // const student = await lookupStudent(existingData.student_id);
-        const student = users?.find((user) => user.id === existingData.student_id);
+        const student = users?.find(
+          (user) => user.id === existingData.student_id,
+        );
         // const section = await lookupSection(existingData.section_id);
-        const section = toolGroups?.find((group) => group.id === existingData.section_id);
-        
+        const section = toolGroups?.find(
+          (group) => group.id === existingData.section_id,
+        );
+
         form.reset({
           emails: student?.email ? [{ value: student.email }] : [{ value: "" }],
           toolGroup: section?.id ? section.id.toString() : "",
           eventType: existingData.event_type,
           notes: existingData.notes || "",
-          timestamp: DateTime.fromISO(existingData.timestamp).toISO()?.slice(0, 16) || "",
+          timestamp:
+            DateTime.fromISO(existingData.timestamp).toISO()?.slice(0, 16) ||
+            "",
         });
       }
     };
     populateInfo();
   }, [existingData, form]);
-
 
   const onSubmit = async (values: FormValues) => {
     setError("");
@@ -134,17 +144,17 @@ export default function LogTraining() {
       return;
     }
 
-    const emailList = values.emails.map(e => e.value);
+    const emailList = values.emails.map((e) => e.value);
     const students = users?.filter((user) => emailList.includes(user.email));
     const invalidStudents = emailList.filter(
-      (email) => !students?.find((student) => student.email === email)
+      (email) => !students?.find((student) => student.email === email),
     );
     console.log("students", students);
     console.log("invalid", invalidStudents);
 
     if (invalidStudents.length) {
       setError(
-        `The following student emails were not found: ${invalidStudents.join(", ")}`
+        `The following student emails were not found: ${invalidStudents.join(", ")}`,
       );
       return;
     }

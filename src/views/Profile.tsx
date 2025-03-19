@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import supabase from "../clients/supabase";
 import { formatUserRole } from "../utility/Formatting";
 import { useNavigate } from "react-router";
