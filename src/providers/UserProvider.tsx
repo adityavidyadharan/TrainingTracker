@@ -3,12 +3,9 @@ import supabase from "../clients/supabase";
 import { RoledUser, UserRoles } from "../types/responses";
 import { jwtDecode } from "jwt-decode";
 
-const UserContext = createContext<{ user: RoledUser | null; loading: boolean }>(
-  {
-    user: null,
-    loading: true,
-  },
-);
+const UserContext = createContext<{ user: RoledUser | null }>({
+  user: null,
+});
 
 type JWT = {
   user_role: UserRoles;
@@ -17,7 +14,6 @@ type JWT = {
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<RoledUser | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -27,7 +23,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
       if (session?.user) {
         const jwt = jwtDecode<JWT>(session.access_token);
-        setLoading(false);
         setUser({
           ...session.user,
           user_role: jwt.user_role,
@@ -45,7 +40,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           const jwt = jwtDecode<JWT>(session.access_token);
           const role = jwt.user_role;
           const email = jwt.user_email;
-          setLoading(false);
           setUser({
             ...session.user,
             user_role: role,
@@ -62,9 +56,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, loading }}>
-      {children}
-    </UserContext.Provider>
+    <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>
   );
 }
 

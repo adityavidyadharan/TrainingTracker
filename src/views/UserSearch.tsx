@@ -19,6 +19,12 @@ import {
 import DataTable from "../components/DataTable";
 import { useQueryClient } from "@tanstack/react-query";
 import TablePagination from "../components/TablePagination";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "../components/ui/card";
 
 type User = Pick<Tables<"users">, "id" | "name" | "email">;
 
@@ -176,7 +182,16 @@ export default function UserSearch() {
         )}
       </div>
 
-      {selectedUser && <TrainingStatus user_id={selectedUser.id} />}
+      {selectedUser && (
+        <Card className="mt-6 max-w-4xl mx-auto container">
+          <CardHeader>
+            <CardTitle>Training Status for {selectedUser.name}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TrainingStatus user_id={selectedUser.id} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
