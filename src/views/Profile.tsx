@@ -10,14 +10,14 @@ export default function Profile() {
   const navigate = useNavigate();
   const user = useUser().user;
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      // if (!user) {
-      //   navigate("/login");
-      // }
-    };
-    fetchUser();
-  }, [navigate, user]);
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     if (!user) {
+  //       navigate("/login");
+  //     }
+  //   };
+  //   fetchUser();
+  // }, [navigate, user]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

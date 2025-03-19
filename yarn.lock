@@ -4033,6 +4033,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jwt-decode@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "jwt-decode@npm:4.0.0"
+  checksum: 10c0/de75bbf89220746c388cf6a7b71e56080437b77d2edb29bae1c2155048b02c6b8c59a3e5e8d6ccdfd54f0b8bda25226e491a4f1b55ac5f8da04cfbadec4e546c
+  languageName: node
+  linkType: hard
+
 "keyv@npm:^4.5.4":
   version: 4.5.4
   resolution: "keyv@npm:4.5.4"
@@ -5556,6 +5563,7 @@ __metadata:
     eslint-plugin-react-refresh: "npm:^0.4.18"
     gh-pages: "npm:^6.3.0"
     globals: "npm:^16.0.0"
+    jwt-decode: "npm:^4.0.0"
     lucide-react: "npm:^0.483.0"
     luxon: "npm:^3.5.0"
     next-themes: "npm:^0.4.6"

@@ -20,8 +20,8 @@ function App() {
     <BrowserRouter basename="/TrainingTracker">
       <QueryClientProvider client={queryClient}>
         <SidebarProvider>
-          <AppSidebar />
           <UserProvider>
+          <AppSidebar />
             <SidebarInset>
 
             <Header />

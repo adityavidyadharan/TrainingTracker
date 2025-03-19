@@ -32,13 +32,9 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
   >({});
   const [loading, setLoading] = useState(true);
 
-  let user: string;
+  
   const currentUser = useUser().user;
-  if (user_id) {
-    user = user_id;
-  } else {
-    user = currentUser?.id || "";
-  }
+  const user = user_id ?? currentUser?.id ?? null;
 
   const fetchInfo = async () => {
     setLoading(true);
@@ -115,7 +111,7 @@ export default function TrainingStatus({ user_id }: { user_id?: string }) {
 
   useEffect(() => {
     fetchInfo();
-  }, []);
+  }, [user]);
 
   const listPrereq = (id: number): SectionWithProgress[] => {
     const prereqs = [];
