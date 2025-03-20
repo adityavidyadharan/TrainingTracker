@@ -1,5 +1,6 @@
 import {
   CircleUser,
+  Clock,
   Home,
   ListCheck,
   LogOut,
@@ -30,6 +31,7 @@ const items = [
     items: [
       { title: "User Search", url: "/search", icon: Search },
       { title: "Log Training", url: "/training", icon: SquarePen },
+      { title: "Recent Trainings", url: "/recent/trainings", icon: Clock },
     ],
     roles: ["admin", "full_pi", "provisional_pi"],
   },

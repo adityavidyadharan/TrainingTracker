@@ -203,8 +203,11 @@ export default function UserManagementPage() {
   }
 
   return (
-    <div className="container mx-auto py-4">
-      <div className="flex gap-4 mb-4">
+    <div className="container mx-auto py-4 max-w-4xl">
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        User Role Management
+      </h2>
+      <div className="flex gap-4 mb-4 items-center justify-center">
         <Input
           type="text"
           placeholder="Search users..."
@@ -252,7 +255,7 @@ export default function UserManagementPage() {
         </Button>
       </div>
 
-      <div className="border rounded-md">
+      <div className="rounded-md max-w-4xl mx-auto px-4 py-2">
         <DataTable table={table} isLoading={isLoading} />
       </div>
       <TablePagination

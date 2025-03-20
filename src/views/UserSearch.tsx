@@ -115,9 +115,9 @@ export default function UserSearch() {
   return (
     <div className="container mx-auto py-4">
       <div className="max-w-2xl mx-auto px-4">
-        <h3 className="text-2xl font-bold mb-4">
+        <h2 className="text-2xl font-bold mb-4 text-center">
           User Lookup & Training Status
-        </h3>
+        </h2>
         <div className="flex gap-4 mb-4">
           <Input
             type="text"
@@ -162,11 +162,6 @@ export default function UserSearch() {
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        {isError && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{isError}</AlertDescription>
           </Alert>
         )}
         {!selectedUser && (

@@ -14,6 +14,7 @@ import { AppSidebar } from "./components/AppSidebar";
 import Header from "./components/Header";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import Logout from "./views/Logout";
+import RecentTrainings from "./views/RecentTrainings";
 
 function App() {
   const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ function App() {
                   <Route path="/search" element={<UserSearch />} />
                   <Route path="/roles" element={<UserRoles />} />
                   <Route path="/logout" element={<Logout />} />
+                  <Route path="/recent/trainings" element={<RecentTrainings />} />
                 </Routes>
               </ProtectedRoutes>
             </SidebarInset>
