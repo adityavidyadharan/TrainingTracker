@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  ColumnFiltersState,
   createColumnHelper,
   getCoreRowModel,
   getFilteredRowModel,
@@ -45,7 +46,7 @@ declare module "@tanstack/table-core" {
 export default function UserManagementPage() {
   const queryClient = useQueryClient();
   const [globalFilter, setGlobalFilter] = useState("");
-  const [roleFilter, setRoleFilter] = useState("");
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0, //initial page index
     pageSize: 10, //default page size
@@ -170,8 +171,10 @@ export default function UserManagementPage() {
     state: {
       globalFilter,
       pagination,
+      columnFilters,
     },
     onGlobalFilterChange: setGlobalFilter,
+    onColumnFiltersChange: setColumnFilters,
   });
 
   const pages = table.getPageCount();
@@ -217,8 +220,11 @@ export default function UserManagementPage() {
           disabled={isLoading}
         />
         <Select
-          value={roleFilter}
-          onValueChange={setRoleFilter}
+          value={columnFilters.find((f) => f.id === "role")?.value as string || ""}
+          onValueChange={(value) => {
+            table.getColumn("role")?.setFilterValue(value);
+          }
+          }
           disabled={isLoading}
         >
           <SelectTrigger className="w-40">
@@ -231,11 +237,11 @@ export default function UserManagementPage() {
             <SelectItem value="admin">Admin</SelectItem>
           </SelectContent>
         </Select>
-        {(roleFilter || globalFilter) && (
+        {(globalFilter || columnFilters.length > 0) && (
           <Button
             variant="outline"
             onClick={() => {
-              setRoleFilter("");
+              table.getColumn("role")?.setFilterValue("");
               setGlobalFilter("");
             }}
           >
