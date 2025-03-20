@@ -3,10 +3,12 @@ import supabase from "../clients/supabase";
 import { RoledUser, UserRoles } from "../types/responses";
 import { jwtDecode } from "jwt-decode";
 
-const UserContext = createContext<{ user: RoledUser | null, loading: boolean }>({
-  loading: true,
-  user: null,
-});
+const UserContext = createContext<{ user: RoledUser | null; loading: boolean }>(
+  {
+    loading: true,
+    user: null,
+  },
+);
 
 type JWT = {
   user_role: UserRoles;
@@ -62,7 +64,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, loading }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ user, loading }}>
+      {children}
+    </UserContext.Provider>
   );
 }
 

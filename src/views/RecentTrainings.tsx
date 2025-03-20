@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "../providers/UserProvider";
 import supabase from "../clients/supabase";
-import { createColumnHelper, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import {
+  createColumnHelper,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { useMemo } from "react";
 import { TrainingHistorical } from "../types/responses";
 import DataTable from "../components/DataTable";
@@ -12,7 +17,7 @@ import { Link } from "react-router";
 import { Button } from "../components/ui/button";
 
 type TrainingData = TrainingHistorical & {
-  student: { name: string, id: string };
+  student: { name: string; id: string };
   section: { name: string };
 };
 // type Training = {
@@ -32,7 +37,9 @@ export default function RecentTrainings() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trainings")
-        .select("*, section:sections!section_id(name), pi:users!pi_id(name), student:users!student_id(id, name)")
+        .select(
+          "*, section:sections!section_id(name), pi:users!pi_id(name), student:users!student_id(id, name)",
+        )
         .eq("pi_id", user?.id || "")
         .limit(10);
       if (error) {
@@ -59,7 +66,7 @@ export default function RecentTrainings() {
                 {row.getValue()}
               </Link>
             </Button>
-          )
+          );
         },
         enableSorting: true,
       }),
@@ -100,7 +107,11 @@ export default function RecentTrainings() {
         <h2 className="text-2xl font-bold text-center mb-6">
           Recent Trainings
         </h2>
-        <DataTable table={table} isLoading={isLoading} noDataMessage="No recent trainings" />
+        <DataTable
+          table={table}
+          isLoading={isLoading}
+          noDataMessage="No recent trainings"
+        />
       </div>
     </div>
   );

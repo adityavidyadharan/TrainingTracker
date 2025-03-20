@@ -40,7 +40,7 @@ export default function UserSearch() {
 
   const [searchParams] = useSearchParams();
 
-  const { data: users = [], isFetching, isLoading, isError } = useUsers();
+  const { data: users = [], isFetching, isLoading } = useUsers();
 
   useEffect(() => {
     const student_id = searchParams.get("sid");

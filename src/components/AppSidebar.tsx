@@ -86,22 +86,22 @@ export function AppSidebar() {
               )}
               {isLoggedIn ? (
                 <>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={url === "/profile"}>
-                    <Link to="/profile">
-                      <CircleUser size={24} />
-                      <span>Profile</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild isActive={url === "/logout"}>
-                    <Link to="/logout">
-                      <LogOut size={24} />
-                      <span>Logout</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={url === "/profile"}>
+                      <Link to="/profile">
+                        <CircleUser size={24} />
+                        <span>Profile</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={url === "/logout"}>
+                      <Link to="/logout">
+                        <LogOut size={24} />
+                        <span>Logout</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
                 </>
               ) : (
                 <SidebarMenuItem>

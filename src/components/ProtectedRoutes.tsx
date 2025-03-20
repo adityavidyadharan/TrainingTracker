@@ -11,7 +11,6 @@ export default function ProtectedRoutes({
   const location = useLocation();
   const navigate = useNavigate();
 
-  
   const isHomePage = location.pathname === "/home";
   const isLoginRedirect = location.pathname === "/profile";
   useEffect(() => {
@@ -19,6 +18,6 @@ export default function ProtectedRoutes({
       navigate("/login");
     }
   }, [user, navigate, isHomePage]);
-  
+
   return children;
 }

@@ -37,7 +37,10 @@ function App() {
                   <Route path="/search" element={<UserSearch />} />
                   <Route path="/roles" element={<UserRoles />} />
                   <Route path="/logout" element={<Logout />} />
-                  <Route path="/recent/trainings" element={<RecentTrainings />} />
+                  <Route
+                    path="/recent/trainings"
+                    element={<RecentTrainings />}
+                  />
                 </Routes>
               </ProtectedRoutes>
             </SidebarInset>
